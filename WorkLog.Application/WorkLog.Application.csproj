@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WorkLog.Domain\WorkLog.Domain.csproj" />
+    <ProjectReference Include="..\WorkLog.infrastructure\WorkLog.infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
