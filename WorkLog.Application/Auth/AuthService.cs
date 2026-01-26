@@ -21,7 +21,7 @@ namespace WorkLog.infrastructure.Auth
             _jwt = jwt;
         }
 
-        public async Task<AuthResponse> Register(RegisterRequest request)
+        public async Task<AuthResponse> Register(RegisterDto request)
         {
             if (await _db.Users.AnyAsync(x => x.Email == request.Email)) throw new Exception("User already exists");
 

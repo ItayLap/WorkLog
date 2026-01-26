@@ -13,10 +13,9 @@ namespace WorkLog.infrastructure.Data
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
-
         public DbSet<User> Users => Set<User>();
         public DbSet<Project> Projects => Set<Project>();
-        public DbSet<Task> Tasks => Set<Task>();
+        public DbSet<TaskItem> Tasks => Set<TaskItem>();
         public DbSet<TimeEntry> TimeEntries => Set<TimeEntry>();
 
         protected override void OnModelCreating(ModelBuilder model)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WorkLog.Application.Auth
 {
-    public class RegisterRequest
+    public class RegisterDto
     {
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
