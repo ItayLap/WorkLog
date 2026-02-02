@@ -38,7 +38,12 @@ namespace WorkLog.infrastructure.Auth
         }
         public async Task<AuthResponse> Login(LogInRequest request)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == request.Email) ?? throw new Exception("Invalid credentials");
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("Invalid credentials");
+            }
 
             if (!PasswordHasher.Verify(request.Password, user.PasswordHash)) throw new Exception("Invalid credentials");
 
