@@ -30,7 +30,7 @@ export default function RegisterPage() {
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Email</Form.Label>
-                            <input type="email" placeholder="Enter email" value={email} onChange={e => setEmail(e.target.value)} required/>
+                            <Form.Control type="email" placeholder="Enter email" value={email} onChange={e => setEmail(e.target.value)} required/>
                         </Form.Group>
 
                         <Form.Group className="mb-4">

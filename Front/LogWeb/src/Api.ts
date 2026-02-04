@@ -6,7 +6,7 @@ export async function login(email: string, password: string) {
         headers:{
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password})
+        body: JSON.stringify({email, password}),
     });
     if(!res.ok){
         throw new Error('Invalid credentials');
@@ -20,7 +20,7 @@ export async function register(email: string, password: string) {
         headers:{
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({email, password})
+        body: JSON.stringify({email, password}),
     });
     if(!res.ok){
         throw new Error('Invalid credentials');

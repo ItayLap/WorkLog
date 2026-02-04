@@ -40,12 +40,12 @@ namespace WorkLog.infrastructure.Auth
         {
             var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
 
-            if (user == null)
+            if (user == null || !PasswordHasher.Verify(request.Password, user.PasswordHash))
             {
                 throw new UnauthorizedAccessException("Invalid credentials");
             }
 
-            if (!PasswordHasher.Verify(request.Password, user.PasswordHash)) throw new Exception("Invalid credentials");
+           // if (!PasswordHasher.Verify(request.Password, user.PasswordHash)) throw new Exception("Invalid credentials");
 
             return new AuthResponse{ 
                 Token = _jwt.Generate(user)

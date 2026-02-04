@@ -15,9 +15,27 @@ namespace WorkLog.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<AuthResponse> Register(RegisterDto request) => await _auth.Register(request);
+        public async Task<IActionResult> Register(RegisterDto request)
+        {
+            try
+            {
+                return Ok(await _auth.Register(request));
+            }catch(InvalidOperationException e)
+            {
+                return Unauthorized(new {message = e.Message});
+            }
+        }
 
         [HttpPost("login")]
-        public async Task<AuthResponse> Login(LogInRequest request) => await _auth.Login(request);
+        public async Task<IActionResult> Login(LogInRequest request)
+        {
+            try
+            {
+                return Ok(await _auth.Login(request));
+            }catch(UnauthorizedAccessException)
+            {
+                return Unauthorized(new {message = "invalid email or password"});
+            }
+        }
     }
 }
