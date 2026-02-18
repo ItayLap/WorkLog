@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,7 +30,8 @@ namespace WorkLog.infrastructure.Auth
             {
                 Id = Guid.NewGuid(),
                 Email = request.Email,
-                PasswordHash = PasswordHasher.Hash(request.Password)
+                PasswordHash = PasswordHasher.Hash(request.Password),
+                //Role = UserRole.Admin
             };
 
             _db.Users.Add(user); 
@@ -50,6 +52,8 @@ namespace WorkLog.infrastructure.Auth
             return new AuthResponse{ 
                 Token = _jwt.Generate(user)
             }; 
+            
         }
+        
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using WorkLog.infrastructure.Auth;
 using WorkLog.infrastructure.Data;
 
@@ -31,6 +33,23 @@ builder.Services.AddCors(options =>
         policy.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
     });
 });
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["jwt:Key"]!)
+                )
+        }; // keep coding from here >_>
+
+    });
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkLog.Application.Auth;
 using WorkLog.infrastructure.Auth;
 
@@ -36,6 +37,13 @@ namespace WorkLog.Api.Controllers
             {
                 return Unauthorized(new {message = "invalid email or password"});
             }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin-data")]
+        public IActionResult GetAdminData()
+        {
+            return Ok("Secret admin information");
         }
     }
 }
