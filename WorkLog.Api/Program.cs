@@ -47,7 +47,7 @@ builder.Services.AddAuthentication("Bearer")
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["jwt:Key"]!)
                 )
-        }; // keep coding from here >_>
+        };
 
     });
 

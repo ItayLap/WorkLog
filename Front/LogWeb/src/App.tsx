@@ -3,6 +3,7 @@ import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 import DashboardPage from "./Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminPage from "./AdminPage";
 import Logout from "./Logout";
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
                 <Route path="/logout" element={<Logout/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}/>
+                <Route path="/admin" element={<ProtectedRoute><AdminPage/></ProtectedRoute>}/>
                 <Route path="*" element={<Navigate to="/login" replace />}/>
             </Routes>
         </BrowserRouter>
