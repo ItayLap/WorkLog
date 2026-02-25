@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 using WorkLog.infrastructure.Auth;
 using WorkLog.infrastructure.Data;
@@ -45,8 +46,9 @@ builder.Services.AddAuthentication("Bearer")
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["jwt:Key"]!)
-                )
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+                ),
+            RoleClaimType = ClaimTypes.Role
         };
 
     });

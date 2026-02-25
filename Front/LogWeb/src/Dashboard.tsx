@@ -19,7 +19,7 @@ export default function DashboardPage(){
                 <Card className="p-3 mt-3 border-danger">
                     <h5>Admin Panel</h5>
                     <p>avaliblewesf for ONLYYY Admins</p>
-                    <Button variant="danger">Manage Users</Button>
+                    <Button variant="danger" >Manage Users</Button>
                 </Card>
             )}
         </div>

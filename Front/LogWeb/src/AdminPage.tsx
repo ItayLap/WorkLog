@@ -1,38 +1,69 @@
 import { useEffect, useState } from "react";
-import { Button, Table } from "react-bootstrap";
+import { Alert, Button, Table } from "react-bootstrap";
+type UserRow = {
+    id: string;
+    email:string;
+    role: string;
+}
 
 export default function Adminpage(){
-    const [users, setUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<UserRow[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
-    const token =localStorage.getItem("token");
-    useEffect(() => {
-        fetch("/api/admin/users",{
-            headers:{
-                Authorization: `Bearer ${token}`
-            }
-        }).then(res => {
-            if(!res.ok){
+    const token = localStorage.getItem("token");
+
+    async function loadUsers () {
+        setError("")
+        if (!token) return;
+
+        try {
+            const res = await fetch("/api/admin/users", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!res.ok)
+            {
                 throw new Error("Failed to fetch users");
             }
-            return res.json();
-        })
-        .then(data => setUsers(data))
-        .catch(err => console.error(err));
-    }, [])
 
-    const changeRole = async(id: string, role: string) =>{
-        await fetch(`/api/admin/set-role?userId=${id}&role=${role}`,{
+            const data = await res.json();
+            setUsers(data);
+        } catch (err) {
+            setError("Failed to load users");
+            console.error(err);
+        }
+    };
+    useEffect(() => {
+        loadUsers();
+
+    }, []);
+
+    async function  changeRole (id: string, role: "Admin" | "User") {
+        if (!token)return;
+            
+        try{
+            const res = await fetch(`/api/admin/set-role?userId=${id}&role=${role}`,{
             method: "PUT",
             headers: {
-                Authorization: `Bearer${token}`
+                Authorization: `Bearer ${token}`
             }
-        });
-        window.location.reload();
+            });
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            loadUsers();
+        }catch(err){
+             setError("failed to update role");
+             console.error(err);
+        }
     };
     return (
         <div className="container mt-4">
         
             <h3>Admin Panel</h3>
+            {error && <Alert variant="danger">{error}</Alert>}
             <Table striped bordered>
                 <thead>
                     <tr>

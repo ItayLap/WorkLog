@@ -16,18 +16,20 @@ namespace WorkLog.Api.Controllers
         {
             _db = db;
         }
+
+        [HttpGet("users")]
         public async Task<IActionResult> GetUsers()
         {
             var users = await _db.Users.Select(u => new
             {
-                u.Id,
-                u.Email,
-                u.Role
+               id = u.Id,
+               email =  u.Email,
+               role = u.Role.ToString()
             }).ToListAsync();
             return Ok(users);
         }
         [HttpPut("set-role")]
-        public async Task<IActionResult> SetRole(Guid userId, UserRole role)
+        public async Task<IActionResult> SetRole([FromQuery] Guid userId, [FromQuery] UserRole role)
         {
             var user = await _db.Users.FindAsync(userId);
             if (user == null)
