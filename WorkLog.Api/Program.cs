@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
+using WorkLog.Domain.Entities;
 using WorkLog.infrastructure.Auth;
 using WorkLog.infrastructure.Data;
 
@@ -61,6 +63,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     //app.MapOpenApi();
+}
+
+using(var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if(!db.Users.Any(x => x.Role == WorkLog.Domain.Entities.UserRole.SuperAdmin))
+    {
+        db.Users.Add(new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "superAdmin22@worklog.com",
+            PasswordHash = PasswordHasher.Hash("SuperAdmin123"),
+            Role = UserRole.SuperAdmin
+        });
+        db.SaveChanges();
+    }
 }
 
 app.UseHttpsRedirection();

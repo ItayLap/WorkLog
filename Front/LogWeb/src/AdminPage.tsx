@@ -32,7 +32,7 @@ export default function Adminpage(){
             setUsers(data);
         } catch (err) {
             setError("Failed to load users");
-            console.error(err);
+            console.error("REAL MISTAKE",err);
         }
     };
     useEffect(() => {

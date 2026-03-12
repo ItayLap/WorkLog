@@ -8,7 +8,7 @@ namespace WorkLog.Api.Controllers
 {
     [ApiController]
     [Route("api/admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, SuperAdmin")]
     public class AdminController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -28,6 +28,7 @@ namespace WorkLog.Api.Controllers
             }).ToListAsync();
             return Ok(users);
         }
+        [Authorize(Roles ="SuperAdmin")]
         [HttpPut("set-role")]
         public async Task<IActionResult> SetRole([FromQuery] Guid userId, [FromQuery] UserRole role)
         {

@@ -5,6 +5,7 @@ import DashboardPage from "./Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminPage from "./AdminPage";
 import Logout from "./Logout";
+import AdminRoute from "./AdminRoute";
 
 export default function App() {
     return(
@@ -14,7 +15,7 @@ export default function App() {
                 <Route path="/logout" element={<Logout/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}/>
-                <Route path="/admin" element={<ProtectedRoute><AdminPage/></ProtectedRoute>}/>
+                <Route path="/admin" element={<AdminRoute><AdminPage/></AdminRoute>}/>
                 <Route path="*" element={<Navigate to="/login" replace />}/>
             </Routes>
         </BrowserRouter>

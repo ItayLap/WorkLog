@@ -15,12 +15,22 @@ export default function DashboardPage(){
             <Card className="p-3 mt-3">
                 <h5>User Panel</h5>
                 <p>avaliblewesf for all userd</p>
-            </Card>{role === "Admin" &&(
+            </Card>
+            {role === "Admin" &&(
                 <Card className="p-3 mt-3 border-danger">
                     <h5>Admin Panel</h5>
                     <p>avaliblewesf for ONLYYY Admins</p>
                     <Button variant="danger" >Manage Users</Button>
                 </Card>
+            )}
+            {role === "SuperAdmin" &&( // check if condition always false
+                <Card className="p-3 mt-3 border-danger">
+                    <h5>Super-Admin Panel</h5>
+                    <p>avaliblewesf for ONLYYY Admins</p>
+                    <Link to= "/admin">
+                        <Button variant="danger" >Manage Users</Button>
+                    </Link>
+                </Card> //add super-admin api call
             )}
         </div>
     );

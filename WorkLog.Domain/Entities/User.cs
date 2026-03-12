@@ -10,6 +10,7 @@ namespace WorkLog.Domain.Entities
     {
         User = 0,
         Admin = 1,
+        SuperAdmin = 2
     }
     public class User
     {
