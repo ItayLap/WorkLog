@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkLog.Domain.Entities;
@@ -8,7 +9,8 @@ namespace WorkLog.Api.Controllers
 {
     [ApiController]
     [Route("api/admin")]
-    [Authorize(Roles = "Admin, SuperAdmin")]
+//    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,SuperAdmin")]
     public class AdminController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -28,7 +30,14 @@ namespace WorkLog.Api.Controllers
             }).ToListAsync();
             return Ok(users);
         }
-        [Authorize(Roles ="SuperAdmin")]
+
+        [HttpGet("DebugClaims")]
+        public IActionResult DebugClaims()
+        {
+            return Ok(User.Claims.Select(c => new{c.Type, c.Value}));
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "SuperAdmin")]
         [HttpPut("set-role")]
         public async Task<IActionResult> SetRole([FromQuery] Guid userId, [FromQuery] UserRole role)
         {
