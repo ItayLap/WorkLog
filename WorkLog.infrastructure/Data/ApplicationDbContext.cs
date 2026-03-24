@@ -24,7 +24,7 @@ namespace WorkLog.infrastructure.Data
                 .HasIndex(x => x.Email)
                 .IsUnique();
 
-            model .Entity<Project>()
+            model.Entity<Project>()
                 .HasMany<TaskItem>()
                 .WithOne()
                 .HasForeignKey(x => x.ProjectId)
@@ -35,6 +35,16 @@ namespace WorkLog.infrastructure.Data
                 .WithOne()
                 .HasForeignKey(x => x.TaskItemId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            model.Entity<User>()
+                .HasMany<TimeEntry>()
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            model.Entity<TimeEntry>()
+                .Property(x => x.Note)
+                .HasMaxLength(1000);
         }
     }
 }

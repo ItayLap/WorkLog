@@ -17,7 +17,7 @@ export default function DashboardPage(){
                 <h5>User Panel</h5>
                 <p>avalible for all userd</p>
             </Card>
-            {(role === "Admin") || (role === "SuperAdmin") &&(
+            {(role === "Admin" || role === "SuperAdmin" )&&(
                 <Card className="p-3 mt-3 border-danger">
                     <h5>Admin Panel</h5>
                     <p>avalible for ONLYYY Admins</p>

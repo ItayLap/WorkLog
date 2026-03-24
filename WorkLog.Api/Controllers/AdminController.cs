@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,7 @@ namespace WorkLog.Api.Controllers
             return Ok(User.Claims.Select(c => new{c.Type, c.Value}));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "SuperAdmin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "SuperAdmin,Admin")]
         [HttpPut("set-role")]
         public async Task<IActionResult> SetRole([FromQuery] Guid userId, [FromQuery] UserRole role)
         {
@@ -46,9 +47,18 @@ namespace WorkLog.Api.Controllers
             {
                 return NotFound();
             }
+            if (user.Role == UserRole.SuperAdmin)
+            {
+                return BadRequest("Cannot change SpAd role");
+            }
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(currentUserId == user.Id.ToString())
+            {
+                return BadRequest("you cannot change your own role");
+            }
             user.Role = role;
             await _db.SaveChangesAsync();
-            return Ok(user);
+            return NoContent();
         }
     }
 }
