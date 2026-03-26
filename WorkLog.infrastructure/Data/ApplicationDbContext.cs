@@ -34,7 +34,7 @@ namespace WorkLog.infrastructure.Data
                 .HasMany<TimeEntry>()
                 .WithOne()
                 .HasForeignKey(x => x.TaskItemId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             model.Entity<User>()
                 .HasMany<TimeEntry>()

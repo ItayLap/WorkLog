@@ -13,6 +13,7 @@ namespace WorkLog.Domain.Entities
         public Guid UserId { get; set; }
         public string Name { get; set; } = null!;
 
+        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     }
 }
