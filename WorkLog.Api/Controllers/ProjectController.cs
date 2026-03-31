@@ -34,7 +34,7 @@ namespace WorkLog.Api.Controllers
             }
 
             var projects = await _db.Projects
-                .Where(p => p.UserId == userId)
+                .Where(p => p.UserId == userId.Value)
                 .Select(p => new
                 {
                     p.Id,
@@ -45,13 +45,17 @@ namespace WorkLog.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Project project)
+        public async Task<IActionResult> Create([FromBody] CreateProjectDto dto)
         {
             var userId = GetUserId();
             if (userId == null) return Unauthorized();
 
-            project.Id = Guid.NewGuid();
-            project.UserId = userId.Value;
+            var project = new Project
+            {
+                Id = Guid.NewGuid(),
+                Name = dto.Name,
+                UserId = userId.Value,
+            };
 
             _db.Projects.Add(project);
             await _db.SaveChangesAsync();
@@ -62,5 +66,9 @@ namespace WorkLog.Api.Controllers
             });
         }
         
+    }
+    public class CreateProjectDto
+    {
+        public string Name { get; set; }
     }
 }
