@@ -66,16 +66,19 @@ namespace WorkLog.Api.Controllers
             {
                 return Unauthorized();
             }
-            var taskExists = await _db.TimeEntries.AnyAsync(x => x.Id == dto.TaskItemId);
+
+            var taskExists = await _db.Tasks.AnyAsync(x => x.Id == dto.TaskItemId);
             if (!taskExists) 
             {
                 return NotFound();
             }
-            var hasActiveEntry = await _db.TimeEntries.AnyAsync(x => x.EndedAtUtc == null);
+
+            var hasActiveEntry = await _db.TimeEntries.AnyAsync(x => x.UserId == userId.Value && x.EndedAtUtc == null);
             if (hasActiveEntry)
             {
                 return BadRequest(new { message = "You already have an active timer" });
             }
+
             var entry = new TimeEntry
             {
                 Id = Guid.NewGuid(),
