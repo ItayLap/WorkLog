@@ -26,7 +26,7 @@ namespace WorkLog.infrastructure.Data
 
             model.Entity<Project>()
                 .HasMany<TaskItem>()
-                .WithOne()
+                .WithOne(c => c.Project)
                 .HasForeignKey(x => x.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 

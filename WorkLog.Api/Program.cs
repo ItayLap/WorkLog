@@ -6,11 +6,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using System.ComponentModel;
 using System.Security.Claims;
 using System.Text;
+using Swashbuckle.AspNetCore;
 using WorkLog.Domain.Entities;
 using WorkLog.infrastructure.Auth;
 using WorkLog.infrastructure.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,14 +22,40 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new() { Title = "WorkLog.Api", Version = "v1" });
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "insert: Bearer {token}"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        },
+        new string[] {}
+        }
+    });
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddSingleton(new JwtService( builder.Configuration["Jwt:Key"]!));
+builder.Services.AddSingleton(new JwtService(builder.Configuration["Jwt:Key"]!));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
@@ -50,7 +80,8 @@ builder.Services
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-    ),RoleClaimType = ClaimTypes.Role
+    ),
+        RoleClaimType = ClaimTypes.Role
     };
 });
 builder.Services.AddAuthorization();
@@ -65,10 +96,10 @@ if (app.Environment.IsDevelopment())
     //app.MapOpenApi();
 }
 
-using(var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if(!db.Users.Any(x => x.Role == WorkLog.Domain.Entities.UserRole.SuperAdmin))
+    if (!db.Users.Any(x => x.Role == WorkLog.Domain.Entities.UserRole.SuperAdmin))
     {
         db.Users.Add(new User
         {
