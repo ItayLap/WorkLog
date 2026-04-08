@@ -25,7 +25,7 @@ namespace WorkLog.Api.Controllers
 
         private Guid? GetCurrentUserId()
         {
-            var userIdValue = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdValue, out var userId))
             {
                 return null;

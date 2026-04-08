@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
-using System.ComponentModel;
 using System.Security.Claims;
 using System.Text;
-using Swashbuckle.AspNetCore;
+
 using WorkLog.Domain.Entities;
 using WorkLog.infrastructure.Auth;
 using WorkLog.infrastructure.Data;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);

@@ -21,7 +21,7 @@ namespace WorkLog.Api.Controllers
 
         private Guid? GetUserId()
         {
-            var id = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Guid.TryParse(id, out var guid) ? guid : null;
         }
         [HttpGet]
