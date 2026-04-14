@@ -65,7 +65,13 @@ namespace WorkLog.Api.Controllers
                 project.Name
             });
         }
-        
+
+        [HttpGet("debug")]
+        public IActionResult Debug()
+        {
+            return Ok(User.Claims.Select(c => new { c.Type, c.Value}));
+        }
+
     }
     public class CreateProjectDto
     {
