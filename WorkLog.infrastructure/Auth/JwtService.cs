@@ -1,11 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using WorkLog.Domain.Entities;
 
 namespace WorkLog.infrastructure.Auth
@@ -36,6 +32,7 @@ namespace WorkLog.infrastructure.Auth
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds);
 
+            Console.WriteLine("JWT GENARATE KEY:" + _key);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }

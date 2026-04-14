@@ -14,6 +14,7 @@ using WorkLog.infrastructure.Auth;
 using WorkLog.infrastructure.Data;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -81,10 +82,13 @@ builder.Services
         IssuerSigningKey = new SymmetricSecurityKey(
         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
     ),
+        NameClaimType = JwtRegisteredClaimNames.Sub,
         RoleClaimType = ClaimTypes.Role
     };
 });
 builder.Services.AddAuthorization();
+
+Console.WriteLine("JWT KEY:" + builder.Configuration["Jwt:key"]);
 
 var app = builder.Build();
 
