@@ -69,6 +69,7 @@ namespace WorkLog.Api.Controllers
         [HttpGet("debug")]
         public IActionResult Debug()
         {
+
             return Ok(User.Claims.Select(c => new { c.Type, c.Value}));
         }
 

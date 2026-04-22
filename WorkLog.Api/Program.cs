@@ -56,7 +56,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddSingleton(new JwtService(builder.Configuration["Jwt:Key"]!));
+builder.Services.AddSingleton(new JwtService(builder.Configuration["Jwt:Key"]!,
+    builder.Services.BuildServiceProvider().GetRequiredService<ILogger<JwtService>>()));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
@@ -83,6 +84,7 @@ builder.Services
         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
     ),
         NameClaimType = JwtRegisteredClaimNames.Sub,
+        //NameClaimType = ClaimTypes.NameIdentifier,
         RoleClaimType = ClaimTypes.Role
     };
 });
