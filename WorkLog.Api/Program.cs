@@ -17,6 +17,7 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 
 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -56,8 +57,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddSingleton(new JwtService(builder.Configuration["Jwt:Key"]!,
-    builder.Services.BuildServiceProvider().GetRequiredService<ILogger<JwtService>>()));
+builder.Services.AddSingleton<JwtService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
@@ -72,8 +72,9 @@ builder.Services.AddCors(options =>
 
 builder.Services
 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+.AddJwtBearer(options =>
 {
+    options.MapInboundClaims = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -84,13 +85,14 @@ builder.Services
         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
     ),
         NameClaimType = JwtRegisteredClaimNames.Sub,
+        RoleClaimType = "role"
         //NameClaimType = ClaimTypes.NameIdentifier,
-        RoleClaimType = ClaimTypes.Role
+        //RoleClaimType = ClaimTypes.Role
     };
 });
 builder.Services.AddAuthorization();
 
-Console.WriteLine("JWT KEY:" + builder.Configuration["Jwt:key"]);
+Console.WriteLine("JWT KEY:" + builder.Configuration["Jwt:Key"]);
 
 var app = builder.Build();
 

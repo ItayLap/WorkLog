@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,9 +12,9 @@ namespace WorkLog.infrastructure.Auth
     {
         private readonly ILogger<JwtService> _logger;
         private readonly string _key;
-        public JwtService(string key, ILogger<JwtService> logger)
+        public JwtService(IConfiguration config,ILogger<JwtService> logger)
         {
-            _key = key;
+            _key = config["Jwt:Key"];
             _logger = logger;
             if (string.IsNullOrEmpty(_key))
             {
@@ -25,18 +26,19 @@ namespace WorkLog.infrastructure.Auth
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                //new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim("role", user.Role.ToString())
+                //new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: "WorkLogAPI",
-                audience: "WorkLogClient",
+                //issuer: "WorkLogAPI",
+                //audience: "WorkLogClient",
                 claims:claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds);
