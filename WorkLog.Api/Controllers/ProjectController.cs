@@ -10,7 +10,7 @@ namespace WorkLog.Api.Controllers
 {
     [ApiController]
     [Route("api/projects")]
-    //[Authorize]
+    [Authorize]
     public class ProjectController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
