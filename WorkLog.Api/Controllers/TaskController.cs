@@ -5,6 +5,7 @@ using Microsoft.Identity.Client;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WorkLog.Domain.Entities;
+using WorkLog.Domain.Enums;
 using WorkLog.infrastructure.Data;
 
 namespace WorkLog.Api.Controllers
@@ -74,7 +75,7 @@ namespace WorkLog.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTask(CreateTaskDto dto)
+        public async Task<IActionResult> AddTask(Guid projectId, [FromBody]CreateTaskDto dto)
         {
             try
             {
@@ -86,39 +87,108 @@ namespace WorkLog.Api.Controllers
                 {
                     return BadRequest(new { error = "Task title too long" });
                 }
+                if (dto.EstimateMinutes < 0)
+                {
+                    return BadRequest(new { error = "Estimated minutes should be positive numbers" });
+                }
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    return Unauthorized(new { error = "User not found" });
+                }
+                var project = await _db.Projects
+                    .FirstOrDefaultAsync(p => p.Id == projectId && p.UserId == userId);
+                if (project == null)
+                {
+                    _logger.LogWarning($"User{userId} tried to create task in non-existant or unauthorized project{projectId}");
+                    return NotFound(new { error = "project not found" });
+                }
+
+                var task = new TaskItem
+                {
+                    Id = Guid.NewGuid(),
+                    ProjectId = projectId,
+                    Title = dto.Title.Trim(),
+                    Status = WorkTaskStatus.Todo,
+                    EstimateMinutes = dto.EstimateMinutes ?? 0
+                };
+                _db.Tasks.Add(task);
+                await _db.SaveChangesAsync();
+                _logger.LogInformation($"Succesfully added task {task}");
+                return CreatedAtAction(
+                    nameof(AddTask),
+                    new { projectId, taskId = task.Id },
+                    new
+                    {
+                        task.Id,
+                        task.ProjectId,
+                        task.Title,
+                        task.Status,
+                        task.EstimateMinutes
+                    });
             }
-            // continiue rewrite here
-            //var projectExists = await _db.Projects.AnyAsync( x => x.Id == dto.ProjectId);
-            //if (!projectExists)
-            //{
-            //    return BadRequest("Project not found");
-            //}
-
-            //var task = new TaskItem
-            //{
-            //    Id = Guid.NewGuid(),
-            //    Title = dto.Title,
-            //    ProjectId = dto.ProjectId,
-            //    EstimateMinutes = dto.EstimateMinutes
-            //};
-
-            //_db.Tasks.Add(task);
-            //await _db.SaveChangesAsync();
-            //return Ok(new
-            //{
-            //    task.Id,
-            //    task.Title,
-            //    task.ProjectId,
-            //    task.EstimateMinutes
-            //});
+            catch( Exception ex ) {
+                _logger.LogError(ex,"Failed to create add task to project");
+                return StatusCode(500, "Server error");
+            }
         }
+        [HttpGet("{taskId}")]
+        public async Task<IActionResult> GetTask(Guid projectId, Guid taskId)
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    return Unauthorized(new { error = "User not found" });
+                }
+                var ownsProject = await UserOwnsProject(projectId, userId.Value);
+                if (!ownsProject)
+                {
+                    return Forbid();   
+                }
+                var task = await _db.Tasks
+                    .Include(t => t.TimeEntries)
+                    .FirstOrDefaultAsync(t => t.Id == taskId && t.ProjectId == projectId);
 
-
+                if (task == null) 
+                {
+                    return NotFound(new { error = "Task not found" });
+                }
+                var responce = new
+                {
+                    task.Id,
+                    task.ProjectId,
+                    task.Title,
+                    task.Status,
+                    task.EstimateMinutes,
+                    TimeEntries = task.TimeEntries.Select(te => new
+                    {
+                        te.Id,
+                        te.StartedAtUtc,
+                        te.Note,
+                    })
+                };
+                return Ok(responce);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get task from project");
+                return StatusCode(500, "Server error");
+            }
+        }
     }
+
     public class CreateTaskDto
     {
-        public string Title { get; set; }
-        public Guid ProjectId { get; set; }
-        public int EstimateMinutes {  get; set; }
+        public string Title { get; set; } = null!;
+        public int? EstimateMinutes {  get; set; }
+    }
+
+    public class UpdateTaskDto 
+    {
+        public string? Title { get; set; }
+        public WorkTaskStatus? Status { get; set; }
+        public int? EstimateMinutes { get; set; }
     }
 }
