@@ -177,6 +177,77 @@ namespace WorkLog.Api.Controllers
                 return StatusCode(500, "Server error");
             }
         }
+
+        [HttpPut("{taskId}")]
+        public async Task<IActionResult> UpdateTask(Guid projectId, Guid taskId, [FromBody]UpdateTaskDto dto)
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    return Unauthorized(new { error = "User not registered" });
+                }
+
+                var ownsProject = await UserOwnsProject(projectId, userId.Value);
+                if (!ownsProject)
+                {
+                    return Forbid();
+                }
+
+                var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId && t.ProjectId == projectId);
+                if (task == null)
+                {
+                    return NotFound(new { error = "Project doesn't exist" });
+                }
+
+                if (!string.IsNullOrWhiteSpace(dto.Title))
+                {
+                    if (dto.Title.Length > 500)
+                    {
+                        return BadRequest(new { error = "title too long" });
+                    }
+                    task.Title = dto.Title.Trim();
+                }
+
+                if (dto.Status.HasValue)
+                {
+                    if (!Enum.IsDefined(typeof(WorkTaskStatus), dto.Status.Value))
+                    {
+                        return BadRequest(new { error = "Invalid task status" });
+                    }
+                    task.Status = dto.Status.Value;
+                }
+
+                if (dto.EstimateMinutes.HasValue)
+                {
+                    if (dto.EstimateMinutes.Value < 0)
+                    {
+                        return BadRequest(new { error = "no negative time" });
+                    }
+                    task.EstimateMinutes = dto.EstimateMinutes.Value;
+                }
+
+                _db.Tasks.Update(task);
+                await _db.SaveChangesAsync();
+
+                _logger.LogInformation($"Task updated succesfully");
+
+                return Ok(new
+                {
+                    task.Id,
+                    task.ProjectId,
+                    task.Title,
+                    task.Status,
+                    task.EstimateMinutes
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+        //delete
     }
 
     public class CreateTaskDto

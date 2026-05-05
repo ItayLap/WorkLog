@@ -14,8 +14,10 @@ namespace WorkLog.Api.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
-        public ProjectController(ApplicationDbContext db)
+        private readonly ILogger<ProjectController> _logger;
+        public ProjectController(ApplicationDbContext db, ILogger<ProjectController> logger)
         {
+            _logger = logger;
             _db = db;
         }
 
@@ -28,21 +30,29 @@ namespace WorkLog.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetMy()
         {
-            var userId = GetUserId();
-            if (userId == null)
+            try
             {
-                return Unauthorized();
-            }
-
-            var projects = await _db.Projects
-                .Where(p => p.UserId == userId.Value)
-                .Select(p => new
+                var userId = GetUserId();
+                if (userId == null)
                 {
-                    p.Id,
-                    p.Name,
-                    p.CreatedAtUtc
-                }).ToListAsync();
-            return Ok(projects);
+                    return Unauthorized();
+                }
+
+                var projects = await _db.Projects
+                    .Where(p => p.UserId == userId.Value)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.CreatedAtUtc
+                    }).ToListAsync();
+                _logger.LogInformation($"retrived{projects.Count} projects for user {userId}");
+                return Ok(projects);
+
+            }catch(Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
         [HttpPost]
@@ -81,6 +91,10 @@ namespace WorkLog.Api.Controllers
     }
     public class CreateProjectDto
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
+    }
+    public class UpdateProjectDto
+    {
+        public string Name { get; set; } = null!;
     }
 }
