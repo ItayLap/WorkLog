@@ -11,6 +11,7 @@ namespace WorkLog.Api.Controllers
     [ApiController]
     [Route("api/projects")]
     [Authorize]
+
     public class ProjectController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -23,7 +24,8 @@ namespace WorkLog.Api.Controllers
 
         private Guid? GetUserId()
         {
-            var id = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+            //var id = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Guid.TryParse(id, out var guid) ? guid : null;
         }
 
@@ -77,7 +79,7 @@ namespace WorkLog.Api.Controllers
             });
         }
 
-        [AllowAnonymous]
+
         [HttpGet("debug")]
         public IActionResult Debug()
         {

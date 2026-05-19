@@ -17,7 +17,7 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 
 
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -74,7 +74,6 @@ builder.Services
 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
-    options.MapInboundClaims = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -84,10 +83,10 @@ builder.Services
         IssuerSigningKey = new SymmetricSecurityKey(
         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
     ),
-        NameClaimType = JwtRegisteredClaimNames.Sub,
-        RoleClaimType = "role"
-        //NameClaimType = ClaimTypes.NameIdentifier,
-        //RoleClaimType = ClaimTypes.Role
+        NameClaimType = ClaimTypes.NameIdentifier,
+        RoleClaimType = ClaimTypes.Role
+        //NameClaimType = JwtRegisteredClaimNames.Sub,
+        //RoleClaimType = "role"
     };
 });
 builder.Services.AddAuthorization();
@@ -120,7 +119,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
 

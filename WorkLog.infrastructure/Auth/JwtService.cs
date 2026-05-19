@@ -26,19 +26,16 @@ namespace WorkLog.infrastructure.Auth
         {
             var claims = new[]
             {
-                //new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("role", user.Role.ToString())
-                //new Claim(ClaimTypes.Role, user.Role.ToString())
+                //new Claim("role", user.Role.ToString())
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                //issuer: "WorkLogAPI",
-                //audience: "WorkLogClient",
                 claims:claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds);
