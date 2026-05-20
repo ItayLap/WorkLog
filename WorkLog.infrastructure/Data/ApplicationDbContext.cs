@@ -25,19 +25,19 @@ namespace WorkLog.infrastructure.Data
                 .IsUnique();
 
             model.Entity<Project>()
-                .HasMany<TaskItem>()
+                .HasMany(x => x.Tasks)
                 .WithOne(c => c.Project)
                 .HasForeignKey(x => x.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             model.Entity<TaskItem>()
-                .HasMany<TimeEntry>()
+                .HasMany(x => x.TimeEntries)
                 .WithOne(x => x.TaskItem)
                 .HasForeignKey(x => x.TaskItemId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             model.Entity<User>()
-                .HasMany<TimeEntry>()
+                .HasMany(x => x.TimeEntries)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);

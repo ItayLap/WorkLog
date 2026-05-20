@@ -57,9 +57,6 @@ namespace WorkLog.Infrastructure.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ProjectId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -70,8 +67,6 @@ namespace WorkLog.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
-
-                    b.HasIndex("ProjectId1");
 
                     b.ToTable("Tasks");
                 });
@@ -95,24 +90,14 @@ namespace WorkLog.Infrastructure.Migrations
                     b.Property<Guid>("TaskItemId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("TaskItemId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UserId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TaskItemId");
 
-                    b.HasIndex("TaskItemId1");
-
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("TimeEntries");
                 });
@@ -157,14 +142,10 @@ namespace WorkLog.Infrastructure.Migrations
             modelBuilder.Entity("WorkLog.Domain.Entities.TaskItem", b =>
                 {
                     b.HasOne("WorkLog.Domain.Entities.Project", "Project")
-                        .WithMany()
+                        .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("WorkLog.Domain.Entities.Project", null)
-                        .WithMany("Tasks")
-                        .HasForeignKey("ProjectId1");
 
                     b.Navigation("Project");
                 });
@@ -172,24 +153,16 @@ namespace WorkLog.Infrastructure.Migrations
             modelBuilder.Entity("WorkLog.Domain.Entities.TimeEntry", b =>
                 {
                     b.HasOne("WorkLog.Domain.Entities.TaskItem", "TaskItem")
-                        .WithMany()
+                        .WithMany("TimeEntries")
                         .HasForeignKey("TaskItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WorkLog.Domain.Entities.TaskItem", null)
-                        .WithMany("TimeEntries")
-                        .HasForeignKey("TaskItemId1");
-
                     b.HasOne("WorkLog.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("TimeEntries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("WorkLog.Domain.Entities.User", null)
-                        .WithMany("TimeEntries")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("TaskItem");
 
