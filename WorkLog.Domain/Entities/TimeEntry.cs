@@ -14,7 +14,7 @@ namespace WorkLog.Domain.Entities
         public TaskItem TaskItem {get; set;} = null!;
         
         public Guid UserId {get; set;}
-        public User User{get; set;} = null!;
+        public User User {get; set;} = null!;
 
         public DateTime StartedAtUtc {get; set;}
         public DateTime? EndedAtUtc { get; set;}

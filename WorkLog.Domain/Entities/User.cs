@@ -19,6 +19,9 @@ namespace WorkLog.Domain.Entities
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
 
+        public ICollection<Project> Projects { get; set; } = new List<Project>();
+        public ICollection<TimeEntry> TimeEntries{ get; set; } = new List<TimeEntry>();
+
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
         public UserRole Role { get; set; } = UserRole.User;
     }

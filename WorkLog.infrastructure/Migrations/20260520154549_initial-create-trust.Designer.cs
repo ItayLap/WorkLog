@@ -12,8 +12,8 @@ using WorkLog.infrastructure.Data;
 namespace WorkLog.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260114165045_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260520154549_initial-create-trust")]
+    partial class initialcreatetrust
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,8 @@ namespace WorkLog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Projects");
                 });
 
@@ -58,6 +60,9 @@ namespace WorkLog.Infrastructure.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ProjectId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -68,6 +73,8 @@ namespace WorkLog.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
+
+                    b.HasIndex("ProjectId1");
 
                     b.ToTable("Tasks");
                 });
@@ -82,7 +89,8 @@ namespace WorkLog.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("StartedAtUtc")
                         .HasColumnType("datetime2");
@@ -90,9 +98,24 @@ namespace WorkLog.Infrastructure.Migrations
                     b.Property<Guid>("TaskItemId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("TaskItemId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UserId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("TaskItemId");
+
+                    b.HasIndex("TaskItemId1");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("TimeEntries");
                 });
@@ -114,6 +137,9 @@ namespace WorkLog.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -122,22 +148,72 @@ namespace WorkLog.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WorkLog.Domain.Entities.TaskItem", b =>
+            modelBuilder.Entity("WorkLog.Domain.Entities.Project", b =>
                 {
-                    b.HasOne("WorkLog.Domain.Entities.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
+                    b.HasOne("WorkLog.Domain.Entities.User", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WorkLog.Domain.Entities.TimeEntry", b =>
+            modelBuilder.Entity("WorkLog.Domain.Entities.TaskItem", b =>
                 {
-                    b.HasOne("WorkLog.Domain.Entities.TaskItem", null)
+                    b.HasOne("WorkLog.Domain.Entities.Project", "Project")
                         .WithMany()
-                        .HasForeignKey("TaskItemId")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("WorkLog.Domain.Entities.Project", null)
+                        .WithMany("Tasks")
+                        .HasForeignKey("ProjectId1");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("WorkLog.Domain.Entities.TimeEntry", b =>
+                {
+                    b.HasOne("WorkLog.Domain.Entities.TaskItem", "TaskItem")
+                        .WithMany()
+                        .HasForeignKey("TaskItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WorkLog.Domain.Entities.TaskItem", null)
+                        .WithMany("TimeEntries")
+                        .HasForeignKey("TaskItemId1");
+
+                    b.HasOne("WorkLog.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WorkLog.Domain.Entities.User", null)
+                        .WithMany("TimeEntries")
+                        .HasForeignKey("UserId1");
+
+                    b.Navigation("TaskItem");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WorkLog.Domain.Entities.Project", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("WorkLog.Domain.Entities.TaskItem", b =>
+                {
+                    b.Navigation("TimeEntries");
+                });
+
+            modelBuilder.Entity("WorkLog.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Projects");
+
+                    b.Navigation("TimeEntries");
                 });
 #pragma warning restore 612, 618
         }

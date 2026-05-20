@@ -32,7 +32,7 @@ namespace WorkLog.infrastructure.Data
 
             model.Entity<TaskItem>()
                 .HasMany<TimeEntry>()
-                .WithOne()
+                .WithOne(x => x.TaskItem)
                 .HasForeignKey(x => x.TaskItemId)
                 .OnDelete(DeleteBehavior.Restrict);
 

@@ -6,11 +6,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkLog.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialcreatetrust : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
@@ -23,20 +38,12 @@ namespace WorkLog.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Projects_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,7 +54,8 @@ namespace WorkLog.Infrastructure.Migrations
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    EstimateMinutes = table.Column<int>(type: "int", nullable: false)
+                    EstimateMinutes = table.Column<int>(type: "int", nullable: false),
+                    ProjectId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -58,6 +66,11 @@ namespace WorkLog.Infrastructure.Migrations
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Projects_ProjectId1",
+                        column: x => x.ProjectId1,
+                        principalTable: "Projects",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -66,9 +79,12 @@ namespace WorkLog.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TaskItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    TaskItemId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -78,8 +94,29 @@ namespace WorkLog.Infrastructure.Migrations
                         column: x => x.TaskItemId,
                         principalTable: "Tasks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TimeEntries_Tasks_TaskItemId1",
+                        column: x => x.TaskItemId1,
+                        principalTable: "Tasks",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TimeEntries_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TimeEntries_Users_UserId1",
+                        column: x => x.UserId1,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_UserId",
+                table: "Projects",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tasks_ProjectId",
@@ -87,9 +124,29 @@ namespace WorkLog.Infrastructure.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tasks_ProjectId1",
+                table: "Tasks",
+                column: "ProjectId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TimeEntries_TaskItemId",
                 table: "TimeEntries",
                 column: "TaskItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeEntries_TaskItemId1",
+                table: "TimeEntries",
+                column: "TaskItemId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeEntries_UserId",
+                table: "TimeEntries",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeEntries_UserId1",
+                table: "TimeEntries",
+                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -105,13 +162,13 @@ namespace WorkLog.Infrastructure.Migrations
                 name: "TimeEntries");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "Tasks");
 
             migrationBuilder.DropTable(
                 name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
