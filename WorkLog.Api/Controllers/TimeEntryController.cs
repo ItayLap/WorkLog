@@ -123,7 +123,9 @@ namespace WorkLog.Api.Controllers
             {
                 entry.Note = dto.Note;
             }
+            
             await _db.SaveChangesAsync();
+
             return Ok(new
             {
                 entry.Id,
@@ -132,8 +134,29 @@ namespace WorkLog.Api.Controllers
                 entry.StartedAtUtc,
                 entry.EndedAtUtc,
                 entry.Note,
-                DurationMinutes = EF.Functions.DateDiffMinute(entry.StartedAtUtc, entry.EndedAtUtc.Value),
+                DurationMinutes = (int)(entry.EndedAtUtc.Value - entry.StartedAtUtc).TotalMinutes
             });
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteEntry(Guid id)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var entry = await _db.TimeEntries
+                .FirstOrDefaultAsync(x =>
+                x.Id == id &&
+                x.UserId ==  userId.Value);
+            if (entry == null) 
+            {
+                return NotFound();
+            }
+            _db.TimeEntries.Remove(entry);
+            await _db.SaveChangesAsync();
+            return NoContent();
         }
     } 
 }
