@@ -57,7 +57,7 @@ export default function ProjectPage(){
                     <div key={project.id} style={{border:"1px solid gray", padding: 12,marginBottom: 10}}>
                         <h3>{project.name}</h3>
                         <Link to={`/projects/${project.id}`}>Open project</Link>
-                        <button onClick={() => handleDelete(project.Id)} style={{marginLeft: 10}}>Delete</button>
+                        <button onClick={() => handleDelete(project.id)} style={{marginLeft: 10}}>Delete</button>
                     </div>
                 ))}
             </div>

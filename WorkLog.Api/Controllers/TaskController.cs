@@ -179,7 +179,7 @@ namespace WorkLog.Api.Controllers
             }
         }
 
-        [HttpPut("{taskId}")]
+        [HttpPut("{taskId:guid}")]
         public async Task<IActionResult> UpdateTask(Guid projectId, Guid taskId, [FromBody]UpdateTaskDto dto)
         {
             try

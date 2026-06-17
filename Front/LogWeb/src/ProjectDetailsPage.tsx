@@ -21,13 +21,14 @@ export default function ProjectDetailsPage(){
         try{
             const data = await GetTasks(projectId);
             setTasks(data);
+            console.log("Rerender");
         }catch(error){
             console.error(error);
         }
     }
     useEffect(()=>{
         loadTasks();
-    },[])
+    }, [])
 
     async function HandleCreate(e: React.FormEvent) {
         e.preventDefault();
@@ -42,8 +43,7 @@ export default function ProjectDetailsPage(){
             }, projectId);
             setTitle("");
             setEstimateMinutes(0);
-        
-            // loadTasks();
+            loadTasks();
 
         }catch(error){
             console.error(error);
@@ -56,11 +56,11 @@ export default function ProjectDetailsPage(){
         }
         try{
             await UpdateTask(
-                projectId,
                 taskId,
+                projectId,
                 status
             );
-            loadTasks(); //
+            loadTasks();
 
         }catch(error){
             console.error(error)
@@ -110,7 +110,8 @@ function Column({title, tasks, onMove}:ColumnProps) {
                     <p>Estimate: {task.estimateMinutes}</p>
                     <button onClick={() => onMove(task.id, 0)}>Todo</button>
                     <button onClick={() => onMove(task.id, 1)}>In progress</button>
-                    <button onClick={() => onMove(task.id, 2)}>Done</button>    
+                    <button onClick={() => onMove(task.id, 2)}>Done</button>
+                    <Link to="/:taskId/timeEntries">Move to entries</Link>    
                 </div>
             ))}
         </div>

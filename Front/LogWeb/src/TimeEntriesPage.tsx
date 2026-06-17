@@ -8,7 +8,7 @@ import {
  } from "./Api/TimeApi";
 
 
-export default function ProjectDetailsPage(){
+export default function TimeEntriesPage(){
     const [entries, setEntries] = useState<any[]>([]);
 
     async function loadEntries() {

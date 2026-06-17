@@ -6,6 +6,9 @@ import ProtectedRoute from "./ProtectedRoute";
 import AdminPage from "./AdminPage";
 import Logout from "./Logout";
 import AdminRoute from "./AdminRoute";
+import ProjectPage from "./ProjectPage"
+import ProjectDetailsPage from "./ProjectDetailsPage"
+import TimeEntriesPage from "./TimeEntriesPage"
 
 export default function App() {
     return(
@@ -15,6 +18,9 @@ export default function App() {
                 <Route path="/logout" element={<Logout/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}/>
+                <Route path="/projects" element={<ProtectedRoute><ProjectPage/></ProtectedRoute>}/>
+                <Route path="/projects/:projectId" element={<ProtectedRoute><ProjectDetailsPage/></ProtectedRoute>}/>
+                <Route path="/projects/:projectId/:taskId/timeEntries" element={<ProtectedRoute><TimeEntriesPage/></ProtectedRoute>}/>
                 <Route path="/admin" element={<AdminRoute><AdminPage/></AdminRoute>}/>
                 <Route path="*" element={<Navigate to="/login" replace />}/>
             </Routes>

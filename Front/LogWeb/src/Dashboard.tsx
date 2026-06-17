@@ -9,6 +9,9 @@ export default function DashboardPage(){
             <h2>welcome to WorkLog</h2>
             <p>You are logged in.</p>
             <p>Role:{role}</p>
+            <Link to="/projects">
+                <Button variant="danger">go to projects</Button>
+            </Link>
             <Link to="/logout">
                 <Button variant="danger">Logout</Button>
             </Link>
