@@ -47,17 +47,26 @@ export default function ProjectPage(){
     }
     return(
         <div style={{padding: 20}}>
-            <h1>Projects</h1>
-            <form onSubmit={handleCreate}>
-                <input placeholder="Project name" value={name} onChange={e=> setName(e.target.value)}/>
-                <button type="submit">Create</button>
-            </form>
-            <div style={{marginTop: 20}}>
+            <div className="projects-page">
+                <div className="projects-header">
+                    <h1>Projects</h1>
+                    <p>Create and manage your workLog projects</p>
+                </div>
+            </div>
+            <div className="create-project-card">
+                <form className="create-project-form" onSubmit={handleCreate}>
+                    <input placeholder="Project name" value={name} onChange={e=> setName(e.target.value)}/>
+                    <button type="submit">Create</button>
+                </form>
+            </div>
+            <div className="projects-grid">
                 {projects.map(project =>(
-                    <div key={project.id} style={{border:"1px solid gray", padding: 12,marginBottom: 10}}>
+                    <div key={project.id} className="project-card">
                         <h3>{project.name}</h3>
-                        <Link to={`/projects/${project.id}`}>Open project</Link>
-                        <button onClick={() => handleDelete(project.id)} style={{marginLeft: 10}}>Delete</button>
+                        <div className="project-actions">
+                            <Link to={`/projects/${project.id}`} className="open-button">Open project</Link>
+                            <button onClick={() => handleDelete(project.id)} className="delete-button">Delete</button>
+                        </div>
                     </div>
                 ))}
             </div>

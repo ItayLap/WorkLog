@@ -1,0 +1,19 @@
+.projects-page{
+    min-height: 100vh;
+    padding: 40px;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.projects-header{
+    margin-bottom: 30px;
+}
+
+.projects-header h1{
+    font-size: 36px;
+    margin-bottom: 8;
+}
+
+.projects-header p{
+    color: #94a3b8;
+}

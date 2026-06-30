@@ -20,7 +20,7 @@ export default function App() {
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}/>
                 <Route path="/projects" element={<ProtectedRoute><ProjectPage/></ProtectedRoute>}/>
                 <Route path="/projects/:projectId" element={<ProtectedRoute><ProjectDetailsPage/></ProtectedRoute>}/>
-                <Route path="/projects/:projectId/:taskId/timeEntries" element={<ProtectedRoute><TimeEntriesPage/></ProtectedRoute>}/>
+                <Route path="/:taskId/timeEntries" element={<ProtectedRoute><TimeEntriesPage/></ProtectedRoute>}/>
                 <Route path="/admin" element={<AdminRoute><AdminPage/></AdminRoute>}/>
                 <Route path="*" element={<Navigate to="/login" replace />}/>
             </Routes>
