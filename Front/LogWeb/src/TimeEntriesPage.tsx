@@ -32,7 +32,6 @@ export default function TimeEntriesPage(){
         try{
             await DeleteEntry(id);
             loadEntries();
-            //remove if loads twice
         }catch(error){
             console.error(error);
         }
@@ -49,11 +48,11 @@ export default function TimeEntriesPage(){
             {entries.map(entry =>
                 <div key={entry.Id}>
                     <p>Task: {entry.taskItemId}</p>
-                    <p>Note: {entry.Note}</p>
-                    <p>Start: {entry.StartedAtUtc}</p>
-                    <p>End: {entry.EndedAtUtc ?? "Not done"}</p>
+                    <p>Note: {entry.note}</p>
+                    <p>Start: {entry.startedAtUtc}</p>
+                    <p>End: {entry.endedAtUtc ?? "Not done"}</p>
                     <p>Duration: {entry.durationMinutes ?? "Running"}</p>
-                    {!entry.EndedAtUtc &&(<button onClick={() => handleStop(entry.Id)}>Stop</button>)}
+                    {!entry.endedAtUtc &&(<button onClick={() => handleStop(entry.Id)}>Stop</button>)}
                     <button onClick={() => handleDelete(entry.Id)}>Delete entry</button>
                 </div>
             )}

@@ -5,7 +5,12 @@ import{
     UpdateTask
 } from "./Api/TaskApi" ;
 
+import {
+    StartTimeEntry
+}from "./Api/TimeApi" ;
+
 import {Link, useParams} from "react-router-dom";
+import Api from "./Api";
 
 
 export default function ProjectDetailsPage(){
@@ -66,7 +71,16 @@ export default function ProjectDetailsPage(){
             console.error(error)
         }
     }
-    
+    async function onStart(taskId: string) {
+        try{
+            await StartTimeEntry({
+                taskItemId: taskId,
+                note: "started from frontend"
+            });
+        }catch(error){
+            console.error(error);
+        }
+    }
     return(
         <div style={{padding:20}}>
             <h1>Project Tasks</h1>
@@ -82,15 +96,19 @@ export default function ProjectDetailsPage(){
             }}>
                 <Column title="Todo"
                 tasks={tasks.filter(x => x.status === 0)}
-                onMove={MoveToTasks}/>
+                onMove={MoveToTasks}
+                onStart={onStart}/>
 
                 <Column title="In Progress"
                 tasks={tasks.filter(x => x.status === 1)}
-                onMove={MoveToTasks}/>
+                onMove={MoveToTasks}
+                onStart={onStart}/>
 
                 <Column title="Done"
                 tasks={tasks.filter(x => x.status === 2)}
-                onMove={MoveToTasks}/>
+                onMove={MoveToTasks}
+                onStart={onStart}/>
+                
             </div>
         </div>
     );
@@ -99,8 +117,9 @@ interface ColumnProps{
     title:string;
     tasks: any[];
     onMove: (taskId: string, status: number) => void;
+    onStart: (taskId: string) => void
 }
-function Column({title, tasks, onMove}:ColumnProps) {
+function Column({title, tasks, onMove, onStart}:ColumnProps) {
     return(
         <div>
             <h2>{title}</h2>
@@ -111,7 +130,8 @@ function Column({title, tasks, onMove}:ColumnProps) {
                     <button onClick={() => onMove(task.id, 0)}>Todo</button>
                     <button onClick={() => onMove(task.id, 1)}>In progress</button>
                     <button onClick={() => onMove(task.id, 2)}>Done</button>
-                    <Link to="/:taskId/timeEntries">Move to entries</Link>    
+                    <button onClick={() => onStart(task.id)}>Start task timer</button>
+                    <Link to={`/tasks/${task.id}/timeEntries`}>Move to entries</Link>    
                 </div>
             ))}
         </div>
