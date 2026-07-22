@@ -18,5 +18,5 @@
     "resolveJsonModule": true
 
   },
-  "include": [ "Src" ]
+  "include": [ "src" ]
 }

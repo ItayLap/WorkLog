@@ -30,6 +30,7 @@ export default function TimeEntriesPage(){
 
     async function handleDelete(id: string) {
         try{
+            await handleStop(id); //////
             await DeleteEntry(id);
             loadEntries();
         }catch(error){
@@ -46,17 +47,16 @@ export default function TimeEntriesPage(){
             <h1>Time Entries</h1>
             {entries.length === 0 &&(<p>no time entries yet</p>)}
             {entries.map(entry =>
-                <div key={entry.Id}>
+                <div key={entry.id}>
                     <p>Task: {entry.taskItemId}</p>
                     <p>Note: {entry.note}</p>
                     <p>Start: {entry.startedAtUtc}</p>
                     <p>End: {entry.endedAtUtc ?? "Not done"}</p>
                     <p>Duration: {entry.durationMinutes ?? "Running"}</p>
-                    {!entry.endedAtUtc &&(<button onClick={() => handleStop(entry.Id)}>Stop</button>)}
-                    <button onClick={() => handleDelete(entry.Id)}>Delete entry</button>
+                    {!entry.endedAtUtc &&(<button onClick={() => handleStop(entry.id)}>Stop</button>)}
+                    <button onClick={() => handleDelete(entry.id)}>Delete entry</button>
                 </div>
             )}
         </div>
     );
 }
-// add handling for time entry functions

@@ -78,6 +78,20 @@ namespace WorkLog.Api.Controllers
                 project.Name
             });
         }
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+            var project = await _db.Projects.FirstOrDefaultAsync(p=> p.Id == id && p.UserId == userId.Value);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            _db.Projects.Remove(project);
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
 
 
         [HttpGet("debug")]
