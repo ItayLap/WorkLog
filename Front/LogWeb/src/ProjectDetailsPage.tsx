@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import{
     CreateTask,
     GetTasks,
-    UpdateTask
+    UpdateTask,
+    DeleteTask
 } from "./Api/TaskApi" ;
 
 import {
@@ -11,10 +12,14 @@ import {
 
 import {Link, useParams} from "react-router-dom";
 import Api from "./Api";
+import axios from "axios";
+
 
 
 export default function ProjectDetailsPage(){
     const {projectId} = useParams();
+
+    const [error, setError] = useState("");
 
     const [tasks, setTasks] = useState<any[]>([]);
 
@@ -54,6 +59,27 @@ export default function ProjectDetailsPage(){
             console.error(error);
         }
     }
+    async function HandleDelete(taskId: string) {
+        if(!projectId){
+            return;
+        }
+        const shouldDelete = window.confirm(
+            "Delete this task?"
+        );
+        if (shouldDelete) {
+            try{
+                await DeleteTask(taskId, projectId);
+                await loadTasks();
+            }catch(deleteError){
+                if (axios.isAxiosError(deleteError)) {
+                    setError(
+                        deleteError.response?.data?.error ?? "Failed to delete task"
+                    );
+                }
+            }
+            return;
+        }
+    }
 
     async function MoveToTasks(taskId: string, status: number) {
         if (!projectId) {
@@ -89,6 +115,9 @@ export default function ProjectDetailsPage(){
                 <input type="number" value={estimateMinutes} placeholder="Estimated task length" onChange={e=> setEstimateMinutes(Number(e.target.value))}/>
                 <button type="submit">Create task</button>
             </form>
+
+            {error && (<p role="alert">{error}</p>)}
+
             <div style={{
                 display:"flex",
                 gap: 20,
@@ -97,17 +126,20 @@ export default function ProjectDetailsPage(){
                 <Column title="Todo"
                 tasks={tasks.filter(x => x.status === 0)}
                 onMove={MoveToTasks}
-                onStart={onStart}/>
+                onStart={onStart}
+                onDelete={HandleDelete}/>
 
                 <Column title="In Progress"
                 tasks={tasks.filter(x => x.status === 1)}
                 onMove={MoveToTasks}
-                onStart={onStart}/>
+                onStart={onStart}
+                onDelete={HandleDelete}/>
 
                 <Column title="Done"
                 tasks={tasks.filter(x => x.status === 2)}
                 onMove={MoveToTasks}
-                onStart={onStart}/>
+                onStart={onStart}
+                onDelete={HandleDelete}/>
                 
             </div>
         </div>
@@ -118,8 +150,9 @@ interface ColumnProps{
     tasks: any[];
     onMove: (taskId: string, status: number) => void;
     onStart: (taskId: string) => void
+    onDelete: (taskId: string) => void
 }
-function Column({title, tasks, onMove, onStart}:ColumnProps) {
+function Column({title, tasks, onMove, onStart, onDelete}:ColumnProps) {
     return(
         <div>
             <h2>{title}</h2>
@@ -127,6 +160,7 @@ function Column({title, tasks, onMove, onStart}:ColumnProps) {
                 <div key={task.id}>
                     <h4>{task.title}</h4>
                     <p>Estimate: {task.estimateMinutes}</p>
+                    <button onClick={() => onDelete(task.id)}></button>
                     <button onClick={() => onMove(task.id, 0)}>Todo</button>
                     <button onClick={() => onMove(task.id, 1)}>In progress</button>
                     <button onClick={() => onMove(task.id, 2)}>Done</button>

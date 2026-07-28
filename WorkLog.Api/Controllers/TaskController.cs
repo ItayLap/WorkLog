@@ -248,7 +248,31 @@ namespace WorkLog.Api.Controllers
                 return StatusCode(500, ex);
             }
         }
+
         //delete
+        [HttpDelete("{taskId:guid}")]
+        public async Task<IActionResult> DeleteTask(Guid projectId, Guid taskId)
+        {
+            var userId = GetUserId();
+            if(userId == null)
+            {
+                return NotFound();
+            }
+            var task =  await _db.Tasks.FirstOrDefaultAsync(t => t.ProjectId == projectId && t.Id == taskId);
+            if(task == null)
+            {
+                return NotFound();
+            }
+            var ownsProject = await UserOwnsProject(projectId, userId.Value);
+            if (!ownsProject)
+            {
+                return Forbid();   
+            }
+            
+            _db.Tasks.Remove(task);
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
     }
 
     public class CreateTaskDto
