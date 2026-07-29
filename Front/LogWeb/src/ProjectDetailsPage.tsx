@@ -26,6 +26,34 @@ export default function ProjectDetailsPage(){
     const [title, setTitle] = useState("");
 
     const [estimateMinutes, setEstimateMinutes] = useState(0);
+
+    const [activeEntry, setActiveEntry] = useState<ActiveTimeEntry | null>(null)
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    useEffect(() =>{
+
+        if (!activeEntry) {
+            setElapsedSeconds(0);
+            return;
+        }
+        const currentEntry = activeEntry;
+        function UpdateElapsedTime(){
+            const startedAt = new Date(
+                currentEntry.startedAtUtc
+            ).getTime();
+            const currentTime = Date.now();
+            const seconds = Math.floor(
+                (currentTime - startedAt) / 1000
+            );
+            setElapsedSeconds(seconds);
+        }
+        UpdateElapsedTime();
+        const intervalId = window.setInterval(
+            UpdateElapsedTime, 1000
+        );
+        return () =>{
+            window.clearInterval(intervalId);
+        }
+    }, [activeEntry])
     async function loadTasks() {
         if (!projectId) return;
         try{
@@ -152,6 +180,14 @@ interface ColumnProps{
     onStart: (taskId: string) => void
     onDelete: (taskId: string) => void
 }
+interface ActiveTimeEntry{
+    id: string;
+    taskItemId: string;
+    startedAtUtc: string;
+    endedAtUtc: string;
+    note: string | null;
+}
+
 function Column({title, tasks, onMove, onStart, onDelete}:ColumnProps) {
     return(
         <div>
@@ -160,7 +196,7 @@ function Column({title, tasks, onMove, onStart, onDelete}:ColumnProps) {
                 <div key={task.id}>
                     <h4>{task.title}</h4>
                     <p>Estimate: {task.estimateMinutes}</p>
-                    <button onClick={() => onDelete(task.id)}></button>
+                    <button onClick={() => onDelete(task.id)}>Delete Task</button>
                     <button onClick={() => onMove(task.id, 0)}>Todo</button>
                     <button onClick={() => onMove(task.id, 1)}>In progress</button>
                     <button onClick={() => onMove(task.id, 2)}>Done</button>

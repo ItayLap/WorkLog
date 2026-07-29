@@ -11,6 +11,8 @@ import {
 export default function TimeEntriesPage(){
     const [entries, setEntries] = useState<any[]>([]);
 
+    
+
     async function loadEntries() {
         try{
             const data = await getMyEntries();

@@ -7,7 +7,11 @@ import{
 
 import {Link} from "react-router-dom";
 import { create } from "axios";
+import axios  from "axios";
+
 export default function ProjectPage(){
+
+    const [error, setError] = useState("");
 
     const [projects, setProjects] = useState<any[]>([]);
 
@@ -38,13 +42,24 @@ export default function ProjectPage(){
     }
 
     async function handleDelete(id: string) {
-        try{
-            await DeleteProject(id);
-            loadProjects();
-        }catch (error){
-            console.error(error);
+        const shouldDelete = window.confirm(
+            "Delete this task?"
+        );
+        if (shouldDelete) {
+            try{
+                await DeleteProject(id);
+                loadProjects();
+            }catch(deleteError){
+                if (axios.isAxiosError(deleteError)) {
+                    setError(
+                        deleteError.response?.data?.error ?? "Failed to delete Project"
+                    );
+                }
+            }
         }
+        return;
     }
+
     return(
         <div style={{padding: 20}}>
             <div className="projects-page">
