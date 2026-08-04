@@ -29,3 +29,9 @@ export async function DeleteEntry(id: string)
     const responce = await Api.delete(`/time-entries/${id}`)
     return responce.data;
 }
+
+export async function GetActiveTimeEntry() {
+    const responce = await Api.get("/time-entries/active");
+    return responce.data.activeEntry;
+}
+

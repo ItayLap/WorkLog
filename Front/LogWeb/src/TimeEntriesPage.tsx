@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import {Link, useParams} from "react-router-dom";
 import { 
     getMyEntries,
-    StartTimeEntry,
     StopTimeEntry,
-    DeleteEntry
+    DeleteEntry,
+    GetActiveTimeEntry
  } from "./Api/TimeApi";
 
 
@@ -39,6 +39,45 @@ export default function TimeEntriesPage(){
             console.error(error);
         }
     }
+
+    interface ActiveTimeEntry{
+        id: string;
+        taskItemId: string;
+        startedAtUtc: string;
+        endedAtUtc: string;
+        note: string | null;
+    }
+
+    const [activeEntry, setActiveEntry] = useState<ActiveTimeEntry | null>(null)
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+    useEffect(() =>{
+
+        if (!activeEntry) {
+            setElapsedSeconds(0);
+            return;
+        }
+        const currentEntry = activeEntry;
+        function UpdateElapsedTime(){
+            const startedAt = new Date(
+                currentEntry.startedAtUtc
+            ).getTime();
+            const currentTime = Date.now();
+            const seconds = Math.floor(
+                (currentTime - startedAt) / 1000
+            );
+            setElapsedSeconds(seconds);
+        }
+        UpdateElapsedTime();
+        const intervalId = window.setInterval(
+            UpdateElapsedTime, 1000
+        );
+        return () =>{
+            window.clearInterval(intervalId);
+        }
+    }, [activeEntry])
+
+
 
     useEffect(()=>{
         loadEntries();

@@ -27,3 +27,5 @@ export async function UpdateTask(taskId: string, projectId: String, status: numb
     const responce = await Api.put(`/projects/${projectId}/tasks/${taskId}`, {status});
     return responce.data;
 }
+
+
