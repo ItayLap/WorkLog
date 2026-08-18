@@ -9,21 +9,24 @@ import AdminRoute from "./AdminRoute";
 import ProjectPage from "./ProjectPage"
 import ProjectDetailsPage from "./ProjectDetailsPage"
 import TimeEntriesPage from "./TimeEntriesPage"
+import { TimerProvider } from "./TimerContext";
 
 export default function App() {
     return(
         <BrowserRouter>
-            <Routes>
-                <Route path="/login" element={<LoginPage/>}/>
-                <Route path="/logout" element={<Logout/>}/>
-                <Route path="/register" element={<RegisterPage/>}/>
-                <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}/>
-                <Route path="/projects" element={<ProtectedRoute><ProjectPage/></ProtectedRoute>}/>
-                <Route path="/projects/:projectId" element={<ProtectedRoute><ProjectDetailsPage/></ProtectedRoute>}/>
-                <Route path="/tasks/:taskId/timeEntries" element={<ProtectedRoute><TimeEntriesPage/></ProtectedRoute>}/>
-                <Route path="/admin" element={<AdminRoute><AdminPage/></AdminRoute>}/>
-                <Route path="*" element={<Navigate to="/login" replace />}/>
-            </Routes>
+            <TimerProvider>
+                <Routes>
+                    <Route path="/login" element={<LoginPage/>}/>
+                    <Route path="/logout" element={<Logout/>}/>
+                    <Route path="/register" element={<RegisterPage/>}/>
+                    <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/></ProtectedRoute>}/>
+                    <Route path="/projects" element={<ProtectedRoute><ProjectPage/></ProtectedRoute>}/>
+                    <Route path="/projects/:projectId" element={<ProtectedRoute><ProjectDetailsPage/></ProtectedRoute>}/>
+                    <Route path="/tasks/:taskId/timeEntries" element={<ProtectedRoute><TimeEntriesPage/></ProtectedRoute>}/>
+                    <Route path="/admin" element={<AdminRoute><AdminPage/></AdminRoute>}/>
+                    <Route path="*" element={<Navigate to="/login" replace />}/>
+                </Routes>
+            </TimerProvider>
         </BrowserRouter>
     );
 }

@@ -4,12 +4,12 @@ import {
     getMyEntries,
     StopTimeEntry,
     DeleteEntry,
-    GetActiveTimeEntry
  } from "./Api/TimeApi";
-
+import { useTimer, formatElapsedSeconds } from "./TimerContext";
 
 export default function TimeEntriesPage(){
     const [entries, setEntries] = useState<any[]>([]);
+    const {activeEntry, elapsedSeconds, stop, refresh} = useTimer();
 
     
 
@@ -24,7 +24,11 @@ export default function TimeEntriesPage(){
 
     async function handleStop(id: string) {
         try{
-            await StopTimeEntry({note:"frontend stopped"}, id)
+            if(activeEntry?.id === id){
+                await stop();
+            }else{
+                await StopTimeEntry({note:"frontend stopped"}, id)
+            } 
         }catch(error){
             console.error(error);
         }
@@ -32,55 +36,19 @@ export default function TimeEntriesPage(){
 
     async function handleDelete(id: string) {
         try{
-            await handleStop(id); //////
+            if (!entries.find(x => x.id === id)?.endedAtUtc) {
+                await handleStop(id);
+            }
             await DeleteEntry(id);
-            loadEntries();
+            await loadEntries();
         }catch(error){
             console.error(error);
         }
     }
 
-    interface ActiveTimeEntry{
-        id: string;
-        taskItemId: string;
-        startedAtUtc: string;
-        endedAtUtc: string;
-        note: string | null;
-    }
-
-    const [activeEntry, setActiveEntry] = useState<ActiveTimeEntry | null>(null)
-    const [elapsedSeconds, setElapsedSeconds] = useState(0);
-
-    useEffect(() =>{
-
-        if (!activeEntry) {
-            setElapsedSeconds(0);
-            return;
-        }
-        const currentEntry = activeEntry;
-        function UpdateElapsedTime(){
-            const startedAt = new Date(
-                currentEntry.startedAtUtc
-            ).getTime();
-            const currentTime = Date.now();
-            const seconds = Math.floor(
-                (currentTime - startedAt) / 1000
-            );
-            setElapsedSeconds(seconds);
-        }
-        UpdateElapsedTime();
-        const intervalId = window.setInterval(
-            UpdateElapsedTime, 1000
-        );
-        return () =>{
-            window.clearInterval(intervalId);
-        }
-    }, [activeEntry])
-
-
-
     useEffect(()=>{
         loadEntries();
+        refresh();
     },[])
  
     return(
@@ -100,4 +68,5 @@ export default function TimeEntriesPage(){
             )}
         </div>
     );
+    // add widget active entry && activeEntry? fromatelapsed? handlestop?
 }

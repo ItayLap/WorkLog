@@ -3,7 +3,7 @@ import{
     CreateTask,
     GetTasks,
     UpdateTask,
-    DeleteTask
+    DeleteTask,
 } from "./Api/TaskApi" ;
 
 import {
@@ -27,6 +27,7 @@ export default function ProjectDetailsPage(){
 
     const [estimateMinutes, setEstimateMinutes] = useState(0);
 
+    
 
 
     async function loadTasks() {
@@ -39,9 +40,10 @@ export default function ProjectDetailsPage(){
             console.error(error);
         }
     }
+
     useEffect(()=>{
         loadTasks();
-    }, [])
+    }, [projectId])
 
     async function HandleCreate(e: React.FormEvent) {
         e.preventDefault();
@@ -56,7 +58,7 @@ export default function ProjectDetailsPage(){
             }, projectId);
             setTitle("");
             setEstimateMinutes(0);
-            loadTasks();
+            await loadTasks();
 
         }catch(error){
             console.error(error);
@@ -94,20 +96,29 @@ export default function ProjectDetailsPage(){
                 projectId,
                 status
             );
-            loadTasks();
+            await loadTasks();
 
         }catch(error){
             console.error(error)
         }
     }
     async function onStart(taskId: string) {
+        setError("");
         try{
-            await StartTimeEntry({
+            const startedEntry = await StartTimeEntry({
                 taskItemId: taskId,
                 note: "started from frontend"
             });
-        }catch(error){
-            console.error(error);
+            // await GetActiveTimeEntry();
+            // TimerState();
+            // setActiveEntry(startedEntry);
+        }catch(startError){
+            if (axios.isAxiosError(startError)) {
+                setError(startError.response?.data?.error ??
+                    startError.response?.data?.message ??
+                    "Failed to start timer"
+                )
+            }
         }
     }
     return(
@@ -132,7 +143,7 @@ export default function ProjectDetailsPage(){
                 onStart={onStart}
                 onDelete={HandleDelete}/>
 
-                <Column title="In Progress"
+                <Column title="In Progress" 
                 tasks={tasks.filter(x => x.status === 1)}
                 onMove={MoveToTasks}
                 onStart={onStart}
@@ -143,7 +154,7 @@ export default function ProjectDetailsPage(){
                 onMove={MoveToTasks}
                 onStart={onStart}
                 onDelete={HandleDelete}/>
-                
+                {/* Import state to  */}
             </div>
         </div>
     );
@@ -156,7 +167,6 @@ interface ColumnProps{
     onDelete: (taskId: string) => void
 }
 
-
 function Column({title, tasks, onMove, onStart, onDelete}:ColumnProps) {
     return(
         <div>
@@ -165,6 +175,7 @@ function Column({title, tasks, onMove, onStart, onDelete}:ColumnProps) {
                 <div key={task.id}>
                     <h4>{task.title}</h4>
                     <p>Estimate: {task.estimateMinutes}</p>
+                    <p>Time spent:{}</p>
                     <button onClick={() => onDelete(task.id)}>Delete Task</button>
                     <button onClick={() => onMove(task.id, 0)}>Todo</button>
                     <button onClick={() => onMove(task.id, 1)}>In progress</button>

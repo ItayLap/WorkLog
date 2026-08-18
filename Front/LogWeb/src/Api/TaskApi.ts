@@ -28,4 +28,3 @@ export async function UpdateTask(taskId: string, projectId: String, status: numb
     return responce.data;
 }
 
-
