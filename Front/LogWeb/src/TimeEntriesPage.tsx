@@ -54,6 +54,19 @@ export default function TimeEntriesPage(){
     return(
         <div style={{padding:20}}>
             <h1>Time Entries</h1>
+            {activeEntry &&(
+                <div style={{padding: 16,
+                    marginBottom: 20,
+                    border:"1px solid #ccc",
+                    borderRadius: 8,
+                    background: "#f7fff7"
+                }}>
+                    <h3 style={{margin:0}}> Active timer</h3>
+                    <p style={{margin:"8px 0"}}>Task: {activeEntry.taskItemId}</p>
+                    <p style={{margin:"8px 0", fontSize:28, fontFamily:"monoscope"}}>Time spent: {formatElapsedSeconds(elapsedSeconds)}</p>
+                    <button onClick={() => handleDelete(activeEntry.id)}>Stop</button>
+                </div>
+            )}
             {entries.length === 0 &&(<p>no time entries yet</p>)}
             {entries.map(entry =>
                 <div key={entry.id}>
@@ -69,4 +82,5 @@ export default function TimeEntriesPage(){
         </div>
     );
     // add widget active entry && activeEntry? fromatelapsed? handlestop?
+
 }
