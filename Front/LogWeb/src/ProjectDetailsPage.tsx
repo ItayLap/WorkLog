@@ -132,7 +132,7 @@ export default function ProjectDetailsPage(){
                 />
 
                 <Column title="Done"
-                    tasks={tasks.filter(x => x.status === 1)}
+                    tasks={tasks.filter(x => x.status === 2)}
                     onMove={MoveToTasks}
                     onStart={onStart}
                     onStop={onStop}
@@ -177,7 +177,6 @@ function Column({title, tasks, onMove, onStart, onStop, onDelete, activeEntry, e
                     <button onClick={() => onMove(task.id, 2)}>Done</button>
                     {isRunning ? (
                         <div>
-                            <p>formatElapsedSeconds(elapsedSeconds)</p>
                             <button onClick={onStop}> stop timer</button>
                         </div>) : (
                             

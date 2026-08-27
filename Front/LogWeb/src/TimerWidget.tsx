@@ -13,7 +13,7 @@ export default function TimerWidget(){
             background: "#1b1b1b",
             color: "#fff"
         }}>
-            <span style={{opacity: 0.7, fontSize: 13}}>Active Timer</span>
+            <span style={{opacity: 0.7, fontSize: 13}}>{activeEntry.taskTitle} Timer</span>
             <span style={{fontFamily: "monospace", fontSize: 18}}>{formatElapsedSeconds(elapsedSeconds)}</span>
             <button onClick={() => stop()}>Stop</button>
         </div>

@@ -58,6 +58,7 @@ namespace WorkLog.Api.Controllers
                 }).ToListAsync();
             return Ok(entries);
         }
+
         [HttpPost("start")]
         public async Task<IActionResult> Start(StartTimeEntryDto dto)
         {
@@ -157,6 +158,32 @@ namespace WorkLog.Api.Controllers
             _db.TimeEntries.Remove(entry);
             await _db.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActive()
+        {
+            var userId = GetCurrentUserId();
+            if(userId == null)
+            {
+                return Unauthorized();
+            }
+            var active = await _db.TimeEntries
+            .Where(x=> x.UserId == userId.Value && x.EndedAtUtc == null)
+            .OrderByDescending(x => x.StartedAtUtc)
+            .Join(_db.Tasks,
+            entry => entry.TaskItemId,
+            task => task.Id, 
+            (entry, task) => new{
+                entry.Id,
+                entry.TaskItemId,
+                TaskTitle = task.Title,
+                entry.UserId,
+                entry.StartedAtUtc,
+                entry.EndedAtUtc,
+                entry.Note
+            }).FirstOrDefaultAsync();
+            return Ok(new {activeEntry = active, });
         }
     } 
 }

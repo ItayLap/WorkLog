@@ -4,6 +4,7 @@ import { GetActiveTimeEntry, StartTimeEntry, StopTimeEntry  } from "./Api/TimeAp
 interface ActiveTimeEntry{
     id: string;
     taskItemId: string;
+    taskTitle: string;
     startedAtUtc: string;
     endedAtUtc: string;
     note: string | null;
@@ -62,14 +63,9 @@ export function TimerProvider({children}: {children: React.ReactNode}){
         }
         const currentEntry = activeEntry;
         function update(){
-            const startedAt = new Date(
-                currentEntry.startedAtUtc
-            ).getTime();
-            const currentTime = Date.now();
-            const seconds = Math.floor(
-                (currentTime - startedAt) / 1000
-            );
-            setElapsedSeconds(seconds);
+            const isoUtc = currentEntry.startedAtUtc.endsWith("Z") ? currentEntry.startedAtUtc : currentEntry.startedAtUtc + "Z";
+            const startedAt = new Date(isoUtc).getTime(); 
+            setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000)); 
         }
         update();
         const intervalId = window.setInterval(
@@ -90,3 +86,10 @@ export function useTimer(){
     }
     return ctx;
 }
+
+    // function update() 
+    // { 
+    //     const isoUtc = currentEntry.startedAtUtc.endsWith("Z") ? currentEntry.startedAtUtc : currentEntry.startedAtUtc + "Z";
+    //     const startedAt = new Date(isoUtc).getTime(); 
+    //     setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000)); 
+    // }
