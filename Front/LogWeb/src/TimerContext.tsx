@@ -1,5 +1,6 @@
 import React, {Children, createContext, useContext, useEffect, useState} from "react";
 import { GetActiveTimeEntry, StartTimeEntry, StopTimeEntry  } from "./Api/TimeApi";
+import axios from "axios";
 
 interface ActiveTimeEntry{
     id: string;
@@ -47,7 +48,16 @@ export function TimerProvider({children}: {children: React.ReactNode}){
 
     async function stop() {
         if (!activeEntry) return;
-        await StopTimeEntry({note:"stoped"}, activeEntry.id)
+        try{
+            await StopTimeEntry({note:"stoped"}, activeEntry.id)
+        }catch(error){
+            const is404 = axios.isAxiosError(error) && error.response?.status === 404;
+            if (!is404) {
+                throw error;
+            }
+        }
+
+
         setActiveEntry(null);
     }
 

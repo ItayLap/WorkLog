@@ -21,7 +21,7 @@ export default function ProjectDetailsPage(){
     const [title, setTitle] = useState("");
     const [estimateMinutes, setEstimateMinutes] = useState(0);
 
-    const {activeEntry, elapsedSeconds, start, stop} = useTimer();
+    const {activeEntry, elapsedSeconds, start, stop, refresh} = useTimer();
 
     async function loadTasks() {
         if (!projectId) return;
@@ -60,6 +60,7 @@ export default function ProjectDetailsPage(){
             try{
                 await DeleteTask(taskId, projectId);
                 await loadTasks();
+                await refresh();
             }catch(deleteError){
                 if (axios.isAxiosError(deleteError)) {
                     setError(deleteError.response?.data?.error ?? "Failed to delete task");
