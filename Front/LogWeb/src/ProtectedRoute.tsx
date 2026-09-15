@@ -6,5 +6,5 @@ export default function ProtectedRoute({children}:{children: JSX.Element}){
     if(!token){
         return <Navigate to="/login" replace/>;
     }
-    return (<><TimerWidget/>{children};</>);
+    return (<><TimerWidget/>{children}</>);
 }
