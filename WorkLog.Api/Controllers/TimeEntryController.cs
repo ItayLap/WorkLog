@@ -45,16 +45,19 @@ namespace WorkLog.Api.Controllers
             var entries = await _db.TimeEntries
                 .Where(x => x.UserId == userId.Value)
                 .OrderByDescending(x => x.StartedAtUtc)
-                .Select(x => new
+                .Join(_db.Tasks,
+                entry => entry.TaskItemId,
+                task => task.Id,
+                (entry, task) => new
                 {
-                    x.Id,
-                    x.TaskItemId,
-                    x.UserId,
-                    x.StartedAtUtc,
-                    x.EndedAtUtc,
-                    x.Note,
-                    DurationMinutes = x.EndedAtUtc.HasValue ? EF.Functions.DateDiffMinute(x.StartedAtUtc, x.EndedAtUtc.Value) : (int?)null
-
+                    entry.Id,
+                    entry.UserId,
+                    entry.TaskItemId,
+                    TaskTitle = task.Title,
+                    entry.StartedAtUtc,
+                    entry.EndedAtUtc,
+                    entry.Note,
+                    DurationMinutes = entry.EndedAtUtc.HasValue ? EF.Functions.DateDiffMinute(entry.StartedAtUtc, entry.EndedAtUtc.Value) : (int?)null
                 }).ToListAsync();
             return Ok(entries);
         }

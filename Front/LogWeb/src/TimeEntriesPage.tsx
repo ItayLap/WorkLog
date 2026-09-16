@@ -62,7 +62,7 @@ export default function TimeEntriesPage(){
                     background: "#f7fff7"
                 }}>
                     <h3 style={{margin:0}}> Active timer</h3>
-                    <p style={{margin:"8px 0"}}>Task: {activeEntry.taskItemId}</p>
+                    <p style={{margin:"8px 0"}}>Task: {activeEntry.taskTitle}</p>
                     <p style={{margin:"8px 0", fontSize:28, fontFamily:"monoscope"}}>Time spent: {formatElapsedSeconds(elapsedSeconds)}</p>
                     <button onClick={() => handleDelete(activeEntry.id)}>Stop</button>
                 </div>
@@ -70,7 +70,7 @@ export default function TimeEntriesPage(){
             {entries.length === 0 &&(<p>no time entries yet</p>)}
             {entries.map(entry =>
                 <div key={entry.id}>
-                    <p>Task: {entry.taskItemId}</p>
+                    <p>Task: {entry.taskTitle}</p>
                     <p>Note: {entry.note}</p>
                     <p>Start: {entry.startedAtUtc}</p>
                     <p>End: {entry.endedAtUtc ?? "Not done"}</p>
