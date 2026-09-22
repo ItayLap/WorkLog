@@ -27,6 +27,16 @@ export default function ProjectDetailsPage(){
 
     const [avalibleMinutes, SetAvalibleMinutes] = useState(480); // default 8 hour work day
     const [plan , setPlan] = useState<ScheduleResult | null>(null);
+    const [notes, setNotes] = useState<Record<string, string>>({});
+
+    function getNote(taskId:string){
+        return notes[taskId]??"";
+    }
+
+    //note
+    function setNoteFor(taskId: string, value: string){
+        setNotes(n => ({...n,[taskId]: value}));
+    }
 
     async function loadTasks() {
         if (!projectId) return;
@@ -88,7 +98,8 @@ export default function ProjectDetailsPage(){
     }
     async function onStart(taskId: string) {
         try{
-            await start(taskId, "started from front end");
+            await start(taskId, getNote(taskId) || "Stopped from frontend");
+            setNoteFor(taskId, "");
         }catch(Error){
             if (axios.isAxiosError(Error)) {
                 setError(Error.response?.data?.error ?? "start failed");
@@ -97,9 +108,10 @@ export default function ProjectDetailsPage(){
         }
     }
 
-    async function onStop() {
-        try{
-            await stop();
+    async function onStop(taskId: string ) {
+        try{   
+            await stop(getNote(taskId));
+            setNoteFor(taskId, "");
         }catch(Error){
             console.log(Error)
         }
@@ -174,7 +186,9 @@ export default function ProjectDetailsPage(){
 
                 <Column title="Todo"
                     tasks={tasks.filter(x => x.status === 0)}
-                    onMove={MoveToTasks}
+                    onMove={MoveToTasks}                    
+                    getNote={getNote}
+                    setNoteFor={setNoteFor}
                     onStart={onStart}
                     onStop={onStop}
                     onDelete={HandleDelete}
@@ -184,6 +198,8 @@ export default function ProjectDetailsPage(){
                 <Column title="In Progress"
                     tasks={tasks.filter(x => x.status === 1)}
                     onMove={MoveToTasks}
+                    getNote={getNote}
+                    setNoteFor={setNoteFor}
                     onStart={onStart}
                     onStop={onStop}
                     onDelete={HandleDelete}
@@ -194,6 +210,8 @@ export default function ProjectDetailsPage(){
                 <Column title="Done"
                     tasks={tasks.filter(x => x.status === 2)}
                     onMove={MoveToTasks}
+                    getNote={getNote}
+                    setNoteFor={setNoteFor}
                     onStart={onStart}
                     onStop={onStop}
                     onDelete={HandleDelete}
@@ -209,15 +227,17 @@ export default function ProjectDetailsPage(){
 interface ColumnProps{
     title:string;
     tasks: any[];
+    getNote:(taskId:string) => string;
+    setNoteFor:(taskId: string, value: string) => void;
     onMove: (taskId: string, status: number) => void;
     onStart: (taskId: string) => void
-    onStop: () => void
+    onStop: (taskId: string) => void
     onDelete: (taskId: string) => void
     activeEntry: { taskItemId: string } | null
     elapsedSeconds: number
 }
 
-function Column({title, tasks, onMove, onStart, onStop, onDelete, activeEntry, elapsedSeconds}:ColumnProps) {
+function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onDelete, activeEntry, elapsedSeconds}:ColumnProps) {
     return(
         <div>
             <h2>{title}</h2>
@@ -238,11 +258,15 @@ function Column({title, tasks, onMove, onStart, onStop, onDelete, activeEntry, e
                     {isRunning ? (
                         <div>
                             <span style={{fontFamily: "monospace", fontSize: 18, margin:"0 8px"}}>{formatElapsedSeconds(elapsedSeconds)}</span>
-                            <button onClick={onStop}> stop timer</button>
+                            <input type="Text" placeholder="Stop note(Optional)" value={getNote(task.id)} onChange={e => setNoteFor(task.id, e.target.value)}/>
+                            <button onClick={() => onStop(task.id)}> stop timer</button>
                         </div>) : (
-                            <button onClick={() => onStart(task.id)} disabled={anotherRunning} title={anotherRunning ? "Another timer is already running" : ""}>
-                                Start task timer
-                            </button>
+                            <div>
+                                <input type="Text" placeholder="Note(Optional)" value={getNote(task.id)} onChange={e => setNoteFor(task.id, e.target.value)}/>
+                                <button onClick={() => onStart(task.id)} disabled={anotherRunning} title={anotherRunning ? "Another timer is already running" : ""}>
+                                    Start task timer
+                                </button>
+                            </div>
                         )}
                         <Link to={`/tasks/${task.id}/timeEntries`}>Move to entries</Link>
                     </div>

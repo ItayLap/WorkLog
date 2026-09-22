@@ -186,7 +186,7 @@ namespace WorkLog.Api.Controllers
                 entry.EndedAtUtc,
                 entry.Note
             }).FirstOrDefaultAsync();
-            return Ok(new {activeEntry = active, });
+            return Ok(new {activeEntry = active});
         }
     } 
 }

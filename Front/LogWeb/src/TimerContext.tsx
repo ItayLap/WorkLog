@@ -15,7 +15,7 @@ interface TimerContextValue{
     elapsedSeconds: number;
     refresh: () => Promise<void>;
     start: (taskItemId: string, note?:string) => Promise<void>;
-    stop: () => Promise<void>;
+    stop: (note?: string) => Promise<void>;
 }
 
 const TimerContext = createContext<TimerContextValue | null>(null);
@@ -46,18 +46,16 @@ export function TimerProvider({children}: {children: React.ReactNode}){
         await refresh();
     }
 
-    async function stop() {
+    async function stop(note? : string) {
         if (!activeEntry) return;
         try{
-            await StopTimeEntry({note:"stoped"}, activeEntry.id)
+            await StopTimeEntry({note: note||"stopped"}, activeEntry.id)
         }catch(error){
             const is404 = axios.isAxiosError(error) && error.response?.status === 404;
             if (!is404) {
                 throw error;
             }
         }
-
-
         setActiveEntry(null);
     }
 
