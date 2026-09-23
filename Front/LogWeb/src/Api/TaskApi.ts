@@ -3,6 +3,7 @@ import Api from "../Api";
 
 export interface CreateTaskRequest{
     title: string;
+    priority: number;
     estimateMinutes: number;
 }
 
@@ -28,3 +29,7 @@ export async function UpdateTask(taskId: string, projectId: String, status: numb
     return responce.data;
 }
 
+export async function UpdateTaskPriority(taskId: string, projectId: string, priority: number) {
+    const responce = await Api.put(`/projects/${projectId}/tasks/${taskId}/priority`, {priority});
+    return responce.data;
+}

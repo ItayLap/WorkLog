@@ -3,7 +3,8 @@ import{
     CreateTask,
     GetTasks,
     UpdateTask,
-    DeleteTask
+    DeleteTask,
+    UpdateTaskPriority
 } from "./Api/TaskApi" ;
 
 import {Link, useParams} from "react-router-dom";
@@ -21,6 +22,7 @@ export default function ProjectDetailsPage(){
     const [error, setError] = useState("");
     const [tasks, setTasks] = useState<any[]>([]);
     const [title, setTitle] = useState("");
+    const [priority, setPriority] = useState(1);
     const [estimateMinutes, setEstimateMinutes] = useState(0);
 
     const {activeEntry, elapsedSeconds, start, stop, refresh} = useTimer();
@@ -57,7 +59,7 @@ export default function ProjectDetailsPage(){
             return;
         }
         try{
-            await CreateTask({ title, estimateMinutes }, projectId);
+            await CreateTask({ title, priority, estimateMinutes }, projectId);
             setTitle("");
             setEstimateMinutes(0);
             loadTasks();
@@ -94,6 +96,17 @@ export default function ProjectDetailsPage(){
             loadTasks();
         }catch(error){
             console.error(error)
+        }
+    }
+
+    async function HandlePriorityChange(taskId:string, newPriority:number) 
+    {
+        if(!projectId)return;
+        try{
+            await UpdateTaskPriority(taskId, projectId, newPriority)
+            await loadTasks();
+        }catch(error){
+            console.log(error);
         }
     }
     async function onStart(taskId: string) {
@@ -136,6 +149,12 @@ export default function ProjectDetailsPage(){
             <form onSubmit={HandleCreate}>
                 <input value={title} placeholder="Task Title" onChange={e=> setTitle(e.target.value)} />
                 <input type="number" value={estimateMinutes} placeholder="Estimated task length" onChange={e=> setEstimateMinutes(Number(e.target.value))}/>
+                <select value={priority} onChange={e => setPriority(Number(e.target.value))}>
+                    <option value="{1}">Low</option>
+                    <option value="{2}">medium</option>
+                    <option value="{3}">high</option>
+                    <option value="{5}">extreme</option>
+                </select>
                 <button type="submit">Create task</button>
             </form>
 

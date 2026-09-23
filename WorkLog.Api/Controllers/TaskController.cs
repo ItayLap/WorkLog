@@ -110,6 +110,7 @@ namespace WorkLog.Api.Controllers
                     Id = Guid.NewGuid(),
                     ProjectId = projectId,
                     Title = dto.Title.Trim(),
+                    Priority = dto.Priority,
                     Status = WorkTaskStatus.Todo,
                     EstimateMinutes = dto.EstimateMinutes ?? 0
                 };
@@ -124,6 +125,7 @@ namespace WorkLog.Api.Controllers
                         task.Id,
                         task.ProjectId,
                         task.Title,
+                        task.Priority,
                         task.Status,
                         task.EstimateMinutes
                     });
@@ -249,6 +251,19 @@ namespace WorkLog.Api.Controllers
             }
         }
 
+        [HttpPut("{id: guid}/ priorty")]
+        public async Task<IActionResult> UpdatePriority(Guid id, UpdatepriorityDto dto)
+        {
+            var task = await _db.Tasks.FirstOrDefaultAsync(x => x.Id == id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+            task.Priority = dto.Priority;
+            await _db.SaveChangesAsync();
+            return Ok(new{task.Id, task.Title, task.Priority, task.EstimateMinutes, task.Status});
+        }
+
         //delete
         [HttpDelete("{taskId:guid}")]
         public async Task<IActionResult> DeleteTask(Guid projectId, Guid taskId)
@@ -278,6 +293,7 @@ namespace WorkLog.Api.Controllers
     public class CreateTaskDto
     {
         public string Title { get; set; } = null!;
+        public int Priority{get; set;} = 1;
         public int? EstimateMinutes {  get; set; }
     }
 
@@ -286,5 +302,10 @@ namespace WorkLog.Api.Controllers
         public string? Title { get; set; }
         public WorkTaskStatus? Status { get; set; }
         public int? EstimateMinutes { get; set; }
+    }
+
+    public class UpdatepriorityDto
+    {
+        public int Priority{get; set;}
     }
 }
