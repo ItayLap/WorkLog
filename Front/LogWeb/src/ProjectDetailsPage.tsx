@@ -264,12 +264,26 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                 const isRunning = activeEntry?.taskItemId === task.id;
                 const anotherRunning = !!activeEntry && !isRunning;
 
+                const priorityColors: Record<number, string> = {1:"#4caf50", 2:"#ff9800", 3:"#f44336"};
+                const priorityLabels: Record<number, string> = {1:"low", 2:"medium", 3:"high"};
+
                 return(
                 <div key={task.id} style={isRunning ? {
                     border: "2px solid #2e7d32", borderRadius: 6, padding: 8, marginBottom: 8
                 } : {marginBottom: 8}}>
                     <h4>{task.title}</h4>
                     <p>Estimate: {task.estimateMinutes}</p>
+                    <span style={{
+                        display:"inline-block",
+                        fontSize: 11,
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        background: priorityColors[task.priority] ?? "#999",
+                        color: "#fff",
+                        marginBottom: 4,
+                        }}>
+                            {priorityLabels[task.priority] ?? "low"}
+                        </span>
                     <button onClick={() => onDelete(task.id)}>Delete Task</button>
                     <button onClick={() => onMove(task.id, 0)}>Todo</button>
                     <button onClick={() => onMove(task.id, 1)}>In progress</button>
