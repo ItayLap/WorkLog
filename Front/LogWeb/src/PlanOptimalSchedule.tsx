@@ -5,7 +5,7 @@ export interface PlannableTask{
     id: string;
     title: string;
     estimateMinutes: number;
-    priority?: number;
+    priority: number;
 }
 
 export interface ScheduleResult{
@@ -57,6 +57,6 @@ export function planOptimalSchedule(tasks: PlannableTask[], avalibleMinutes: num
         skippedTasks: skipped,
         totalMinutesUsed,
         remainingMinutes: budget - totalMinutesUsed,
-        totalPriorityGained: n > 0 && budget > 0 ? dp[n][budget] : 0,
+        totalPriorityGained: selected.reduce((sum, t) => sum + Math.floor(t.priority / 1000), 0),
     };
 }

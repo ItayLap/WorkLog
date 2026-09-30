@@ -60,6 +60,7 @@ namespace WorkLog.Api.Controllers
                         t.Id,
                         t.Title,
                         t.Status,
+                        t.Priority,
                         t.EstimateMinutes,
                         TimeEntriesCount = t.TimeEntries.Count
                     }).OrderBy(t => t.Status)
@@ -164,6 +165,7 @@ namespace WorkLog.Api.Controllers
                     task.ProjectId,
                     task.Title,
                     task.Status,
+                    task.Priority,
                     task.EstimateMinutes,
                     TimeEntries = task.TimeEntries.Select(te => new
                     {
@@ -251,10 +253,10 @@ namespace WorkLog.Api.Controllers
             }
         }
 
-        [HttpPut("{id: guid}/ priorty")]
-        public async Task<IActionResult> UpdatePriority(Guid id, UpdatepriorityDto dto)
+        [HttpPut("{taskId:guid}/priority")]
+        public async Task<IActionResult> UpdatePriority(Guid projectId, Guid taskId, UpdatepriorityDto dto)
         {
-            var task = await _db.Tasks.FirstOrDefaultAsync(x => x.Id == id);
+            var task = await _db.Tasks.FirstOrDefaultAsync(x => x.ProjectId == projectId && x.Id == taskId);
             if (task == null)
             {
                 return NotFound();
@@ -264,7 +266,6 @@ namespace WorkLog.Api.Controllers
             return Ok(new{task.Id, task.Title, task.Priority, task.EstimateMinutes, task.Status});
         }
 
-        //delete
         [HttpDelete("{taskId:guid}")]
         public async Task<IActionResult> DeleteTask(Guid projectId, Guid taskId)
         {

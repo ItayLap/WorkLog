@@ -137,6 +137,7 @@ export default function ProjectDetailsPage(){
             id: t.id,
             title: t.title,
             estimateMinutes: t.estimateMinutes,
+            priority: t.priority,
         }));
 
         const result = planOptimalSchedule(nonCompletedTasks, avalibleMinutes);
@@ -150,10 +151,9 @@ export default function ProjectDetailsPage(){
                 <input value={title} placeholder="Task Title" onChange={e=> setTitle(e.target.value)} />
                 <input type="number" value={estimateMinutes} placeholder="Estimated task length" onChange={e=> setEstimateMinutes(Number(e.target.value))}/>
                 <select value={priority} onChange={e => setPriority(Number(e.target.value))}>
-                    <option value="{1}">Low</option>
-                    <option value="{2}">medium</option>
-                    <option value="{3}">high</option>
-                    <option value="{5}">extreme</option>
+                    <option value={1}>Low</option>
+                    <option value={2}>Medium</option>
+                    <option value={3}>High</option>
                 </select>
                 <button type="submit">Create task</button>
             </form>
@@ -212,7 +212,9 @@ export default function ProjectDetailsPage(){
                     onStop={onStop}
                     onDelete={HandleDelete}
                     activeEntry={activeEntry}
-                    elapsedSeconds={elapsedSeconds}/>
+                    elapsedSeconds={elapsedSeconds}
+                    onPriorityChange={HandlePriorityChange}
+                    />
 
                 <Column title="In Progress"
                     tasks={tasks.filter(x => x.status === 1)}
@@ -224,6 +226,7 @@ export default function ProjectDetailsPage(){
                     onDelete={HandleDelete}
                     activeEntry={activeEntry}
                     elapsedSeconds={elapsedSeconds}
+                    onPriorityChange={HandlePriorityChange}
                 />
 
                 <Column title="Done"
@@ -236,6 +239,7 @@ export default function ProjectDetailsPage(){
                     onDelete={HandleDelete}
                     activeEntry={activeEntry}
                     elapsedSeconds={elapsedSeconds}
+                    onPriorityChange={HandlePriorityChange}
                 />
 
             </div>
@@ -254,18 +258,20 @@ interface ColumnProps{
     onDelete: (taskId: string) => void
     activeEntry: { taskItemId: string } | null
     elapsedSeconds: number
+    onPriorityChange: (taskId: string, newPriority: number) => void
 }
 
-function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onDelete, activeEntry, elapsedSeconds}:ColumnProps) {
+function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onDelete, activeEntry, elapsedSeconds, onPriorityChange}:ColumnProps) {
     return(
         <div>
             <h2>{title}</h2>
             {tasks.map(task =>{
                 const isRunning = activeEntry?.taskItemId === task.id;
                 const anotherRunning = !!activeEntry && !isRunning;
+                const isTaskDone = task.status == 2;
 
                 const priorityColors: Record<number, string> = {1:"#4caf50", 2:"#ff9800", 3:"#f44336"};
-                const priorityLabels: Record<number, string> = {1:"low", 2:"medium", 3:"high"};
+                const priorityLabels: Record<number, string> = {1:"Low", 2:"Medium", 3:"High"};
 
                 return(
                 <div key={task.id} style={isRunning ? {
@@ -284,6 +290,11 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                         }}>
                             {priorityLabels[task.priority] ?? "low"}
                         </span>
+                        <select value={task.priority} onChange={e => onPriorityChange(task.id, Number(e.target.value))}>
+                            <option value={1}>Low</option>
+                            <option value={2}>Medium</option>
+                            <option value={3}>High</option>
+                        </select>
                     <button onClick={() => onDelete(task.id)}>Delete Task</button>
                     <button onClick={() => onMove(task.id, 0)}>Todo</button>
                     <button onClick={() => onMove(task.id, 1)}>In progress</button>
@@ -296,7 +307,7 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                         </div>) : (
                             <div>
                                 <input type="Text" placeholder="Note(Optional)" value={getNote(task.id)} onChange={e => setNoteFor(task.id, e.target.value)}/>
-                                <button onClick={() => onStart(task.id)} disabled={anotherRunning} title={anotherRunning ? "Another timer is already running" : ""}>
+                                <button onClick={() => onStart(task.id)} disabled={anotherRunning || isTaskDone} title={anotherRunning ? "Another timer is already running" : ""}>
                                     Start task timer
                                 </button>
                             </div>
