@@ -53,7 +53,7 @@ export default function EstimateAlert(){
         return null;
     }
 
-    const overrunSeconds = elapsedSeconds - estimateSeconds; ////
+    const overrunSeconds = elapsedSeconds - estimateSeconds - snoozeCount * SNOOZE_MINUTES; ////
     const forgot = overrunSeconds > 60;
 
     async function finish(countOnlyEstimate: boolean) {
@@ -64,7 +64,7 @@ export default function EstimateAlert(){
         setError("");
         try{
             await UpdateTask(activeEntry.taskItemId, activeEntry.projectId, 2); // transfer task to done column
-            const endedAt = countOnlyEstimate ? undefined : new Date(toUtcMs(activeEntry.startedAtUtc) + activeEntry.estimateMinutes + (snoozeCount * SNOOZE_MINUTES) * 60000).toISOString();
+            const endedAt = countOnlyEstimate ? undefined : new Date(toUtcMs(activeEntry.startedAtUtc) + activeEntry.estimateMinutes * 60000 + (snoozeCount * SNOOZE_MINUTES)).toISOString();
             await stop(undefined, endedAt);
         }catch(error){
             console.error(error)
@@ -76,7 +76,8 @@ export default function EstimateAlert(){
 
     function snooze(){
         const until = Date.now() + SNOOZE_MINUTES * 60000;
-        setSnoozeCount(snoozeCount + 1);
+        const count = snoozeCount + 1;
+        setSnoozeCount(count);
         setSnoozeUntil(until);
         try{
             if (snoozeKey) {
@@ -84,7 +85,7 @@ export default function EstimateAlert(){
                 
             }
             if (snoozeCountKey) {
-                localStorage.setItem(snoozeCountKey, String(snoozeCount));
+                localStorage.setItem(snoozeCountKey, String(count));
             }
         }catch{
 
