@@ -1,4 +1,4 @@
-import {useTimer, formatElapsedSeconds} from "./TimerContext";
+import {useTimer, formatElapsedSeconds} from "./utils/TimerContext";
 
 function ColorfulTimer(seconds: number): string{
     const h = Math.floor((seconds/3600) % 24);
@@ -23,10 +23,13 @@ export default function TimerWidget(){
 
     return (
         <div style={{
+            position: "sticky",
+            top:0,
+            zIndex: 1123,
             display: "flex",
             alignItems: "center",
             gap: 12,
-            padding: "8px 16px",
+            padding: "8px 1rem",
             background: backgroundColor,
             color: "#fff"
         }}>

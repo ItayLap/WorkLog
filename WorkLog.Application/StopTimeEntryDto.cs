@@ -9,5 +9,7 @@ namespace WorkLog.Application
     public class StopTimeEntryDto
     {
         public string? Note { get; set; }
+
+        public DateTime? EndedAtUtc {get; set;}
     }
 }

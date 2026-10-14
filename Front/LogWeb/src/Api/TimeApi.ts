@@ -7,6 +7,7 @@ export interface StartTimeEntryRequest{
 }
 export interface StopTimeEntryRequest{
     note? : string;
+    endedAtUtc?: string;
 }
 
 export async function getMyEntries() {

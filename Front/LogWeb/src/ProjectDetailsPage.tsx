@@ -10,11 +10,11 @@ import{
 import {Link, useParams} from "react-router-dom";
 import Api from "./Api";
 import axios from "axios";
-import { useTimer, formatElapsedSeconds } from "./TimerContext";
+import { useTimer, formatElapsedSeconds } from "./utils/TimerContext";
 import { StopTimeEntry } from "./Api/TimeApi";
 import { Button } from "react-bootstrap";
 
-import {planOptimalSchedule, ScheduleResult} from "./PlanOptimalSchedule";
+import {planOptimalSchedule, ScheduleResult} from "./utils/PlanOptimalSchedule";
 
 export default function ProjectDetailsPage(){
     const {projectId} = useParams();
@@ -51,7 +51,7 @@ export default function ProjectDetailsPage(){
     }
     useEffect(()=>{
         loadTasks();
-    }, [])
+    }, [activeEntry?.id])
 
     async function HandleCreate(e: React.FormEvent) {
         e.preventDefault();

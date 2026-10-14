@@ -121,7 +121,17 @@ namespace WorkLog.Api.Controllers
                 return BadRequest(new { message = "Timer already stopped" });
             }
 
-            entry.EndedAtUtc = DateTime.UtcNow;
+            var endedAt = DateTime.UtcNow;
+            if (dto.EndedAtUtc.HasValue)
+            {
+                var requested = DateTime.SpecifyKind(dto.EndedAtUtc.Value, DateTimeKind.Utc);
+                if (requested < entry.StartedAtUtc || requested > endedAt.AddMinutes(1))
+                {
+                    return BadRequest(new{message = "Invalid end time"});
+                }
+                endedAt = requested < endedAt ? requested : endedAt;
+            }
+            entry.EndedAtUtc = endedAt;
 
             if (!string.IsNullOrWhiteSpace(dto.Note))
             {
@@ -181,6 +191,8 @@ namespace WorkLog.Api.Controllers
                 entry.Id,
                 entry.TaskItemId,
                 TaskTitle = task.Title,
+                task.ProjectId,
+                task.EstimateMinutes,
                 entry.UserId,
                 entry.StartedAtUtc,
                 entry.EndedAtUtc,

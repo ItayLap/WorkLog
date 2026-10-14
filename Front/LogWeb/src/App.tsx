@@ -9,7 +9,7 @@ import AdminRoute from "./AdminRoute";
 import ProjectPage from "./ProjectPage"
 import ProjectDetailsPage from "./ProjectDetailsPage"
 import TimeEntriesPage from "./TimeEntriesPage"
-import { TimerProvider } from "./TimerContext";
+import { TimerProvider } from "./utils/TimerContext";
 
 export default function App() {
     return(

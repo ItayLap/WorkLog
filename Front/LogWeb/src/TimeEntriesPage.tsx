@@ -5,7 +5,7 @@ import {
     StopTimeEntry,
     DeleteEntry,
  } from "./Api/TimeApi";
-import { useTimer, formatElapsedSeconds } from "./TimerContext";
+import { useTimer, formatElapsedSeconds } from "./utils/TimerContext";
 
 export default function TimeEntriesPage(){
     const [entries, setEntries] = useState<any[]>([]);

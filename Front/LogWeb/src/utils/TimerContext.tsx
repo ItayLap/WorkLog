@@ -1,13 +1,15 @@
 import React, {Children, createContext, useContext, useEffect, useState} from "react";
-import { GetActiveTimeEntry, StartTimeEntry, StopTimeEntry  } from "./Api/TimeApi";
+import { GetActiveTimeEntry, StartTimeEntry, StopTimeEntry  } from "../Api/TimeApi";
 import axios from "axios";
 
 interface ActiveTimeEntry{
     id: string;
     taskItemId: string;
     taskTitle: string;
+    projectId: string;
+    estimateMinutes: number;
     startedAtUtc: string;
-    endedAtUtc: string;
+    endedAtUtc: string | null;
     note: string | null;
 }
 interface TimerContextValue{
@@ -15,7 +17,7 @@ interface TimerContextValue{
     elapsedSeconds: number;
     refresh: () => Promise<void>;
     start: (taskItemId: string, note?:string) => Promise<void>;
-    stop: (note?: string) => Promise<void>;
+    stop: (note?: string, endedAtUtc?: string) => Promise<void>;
 }
 
 const TimerContext = createContext<TimerContextValue | null>(null);
@@ -42,14 +44,17 @@ export function TimerProvider({children}: {children: React.ReactNode}){
     }
 
     async function start(taskItemId: string, note?:string) {
+        if("Notification" in window && Notification.permission === "default"){
+            Notification.requestPermission();
+        }
         await StartTimeEntry({taskItemId,note})
         await refresh();
     }
 
-    async function stop(note? : string) {
+    async function stop(note? : string, endedAtUtc?: string) {
         if (!activeEntry) return;
         try{
-            await StopTimeEntry({note: note||"stopped"}, activeEntry.id)
+            await StopTimeEntry({note: note||"stopped", endedAtUtc}, activeEntry.id)
         }catch(error){
             const is404 = axios.isAxiosError(error) && error.response?.status === 404;
             if (!is404) {
