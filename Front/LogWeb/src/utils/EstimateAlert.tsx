@@ -8,6 +8,22 @@ const SNOOZE_MINUTES = 1;
 function toUtcMs(iso: string){
     return new Date(iso.endsWith("Z") ? iso : iso + "Z").getTime();
 }
+function formatDuration(totalSeconds: number){
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const w = Math.floor(s / 604800);
+    const d = Math.floor((s % 604800) / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+
+    const parts: string[] = [];
+    if (w > 0) parts.push(`${w} w`);
+    if (w > 0 || d > 0) parts.push(`${d} d`);
+    if (w > 0 || d > 0 || h > 0) parts.push(`${h} h`);
+    if (w > 0 || d > 0 || h > 0 || m > 0) parts.push(`${m} m`);
+    parts.push(`${sec} s`);
+    return parts.join(" ");
+}
 
 export default function EstimateAlert(){
     const {activeEntry, elapsedSeconds, stop} = useTimer();
@@ -19,6 +35,7 @@ export default function EstimateAlert(){
     const [loadedKey, setLoadedKey]  = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
+    const [note, setNote] = useState("");
 
     // useEffect(() =>{
     //     setExtraSeconds(0);
@@ -140,20 +157,25 @@ export default function EstimateAlert(){
             }}>
                 <h3 style={{marginTop:0}}>Estimated time has passed</h3>
                 <p><strong>{activeEntry.taskTitle}</strong></p>
-                <p>Estimate: {activeEntry.estimateMinutes} min time - passed:{formatElapsedSeconds(elapsedSeconds)}</p>
+                <p>Estimate: {formatDuration(activeEntry.estimateMinutes * 60)} min time - passed:{formatDuration(elapsedSeconds)}</p>
                 {snoozeCount > 0 &&(
                     <p>
-                        Snoozed{snoozeCount} time(s) (+{snoozeCount * SNOOZE_MINUTES} min).
-                        Alloted time: {allottedMinutes} min.
+                        Snoozed {snoozeCount} time(s) ({formatDuration(snoozeCount * SNOOZE_MINUTES * 60)} min.).
+                        Alloted time: {formatDuration(allottedMinutes * 60)} min.
                     </p>
                 )}
-                {forgot && (<p>Timer has been running for{Math.floor(overrunSeconds / 60)} minutes more then estimated. did you forget to stop it?</p>)}
+                {forgot && (<p>Timer has been running for{formatDuration(overrunSeconds)} more then estimated. did you forget to stop it?</p>)}
                 {error && <p role="alert" style={{color:"#c62828"}}>{error}</p>}
                 <div style={{display: "flex", flexDirection: "column", gap: 8}}>
                     
                     <button disabled={busy} onClick={() => finish(true)}>task completed(stop and move task to done)</button>
                     <button disabled={busy} onClick={snooze}>Still working(remind in {SNOOZE_MINUTES} min)</button>
-                    {forgot && (<button disabled={busy} onClick={() => finish(false) }>task completed within estimated time {allottedMinutes} min.)</button>)}
+                    {forgot && (<button disabled={busy} onClick={() => finish(false) }>task completed within estimated time <br/>
+                        ({formatDuration(allottedMinutes * 60)} min.)</button>)}
+                    <form style={{display:"flex", flexDirection: "column"}}>
+                        <input type="text" value={note} placeholder="Note" onChange={e => setNote(e.target.value)}/>
+                        <button onClick={UpdateNote}>add note</button>
+                    </form>
                 </div>
             </div>
         </div>

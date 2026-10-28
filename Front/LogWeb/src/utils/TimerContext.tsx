@@ -54,7 +54,7 @@ export function TimerProvider({children}: {children: React.ReactNode}){
     async function stop(note? : string, endedAtUtc?: string) {
         if (!activeEntry) return;
         try{
-            await StopTimeEntry({note: note||"stopped", endedAtUtc}, activeEntry.id)
+            await StopTimeEntry({note: note?.trim() || undefined, endedAtUtc}, activeEntry.id)
         }catch(error){
             const is404 = axios.isAxiosError(error) && error.response?.status === 404;
             if (!is404) {

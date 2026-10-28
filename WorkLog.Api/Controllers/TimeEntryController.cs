@@ -12,6 +12,7 @@ using WorkLog.infrastructure.Data;
 
 namespace WorkLog.Api.Controllers
 {
+    
     [ApiController]
     [Route("api/time-entries")]
     [Authorize]
@@ -150,6 +151,30 @@ namespace WorkLog.Api.Controllers
                 entry.Note,
                 DurationMinutes = (int)(entry.EndedAtUtc.Value - entry.StartedAtUtc).TotalMinutes
             });
+        }
+
+        [HttpPut("{id:guid}/note")]
+        public async Task<IActionResult> UpdateNote(Guid id, UpdateNoteDto dto)
+        {
+            var UserId = GetCurrentUserId();
+            if (UserId == null)
+            {
+                return Unauthorized();
+            }
+            var entry = await _db.TimeEntries.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId.Value);
+            if (entry == null)
+            {
+                return NotFound();
+            }
+            var note = dto.Note?.Trim();
+            if (note != null && note.Length > 500)
+            {
+                return BadRequest(new{message = "note is too long (500 chars max)"});
+            }
+
+            entry.Note = string.IsNullOrWhiteSpace(note) ? null : note;
+            await _db.SaveChangesAsync();
+            return Ok(new {entry.Id, entry.Note});
         }
 
         [HttpDelete("{id:guid}")]

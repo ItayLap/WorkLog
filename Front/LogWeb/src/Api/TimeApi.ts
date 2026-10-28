@@ -31,6 +31,11 @@ export async function DeleteEntry(id: string)
     return responce.data;
 }
 
+export async function  UpdateNote(id: string, note: string) {
+    const responce = await Api.put(`/time-entries/${id}/note`, {note})
+    return responce.data;
+}
+
 export async function GetActiveTimeEntry() {
     const responce = await Api.get("/time-entries/active");
     return responce.data.activeEntry;
