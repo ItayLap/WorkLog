@@ -29,8 +29,10 @@ export default function TimeEntriesPage(){
             if(activeEntry?.id === id){
                 await stop();
             }else{
-                await StopTimeEntry({note:"frontend stopped"}, id)
-            } 
+                await StopTimeEntry({}, id)
+            }
+            await loadEntries();
+            await refresh
         }catch(error){
             console.error(error);
         }
@@ -60,6 +62,11 @@ export default function TimeEntriesPage(){
         }
     }
 
+    function startEdit(entry : any){
+        setEditingId(entry.id);
+        setDraft(entry.note ?? "");
+    }
+
     useEffect(()=>{
         loadEntries();
         refresh();
@@ -85,10 +92,26 @@ export default function TimeEntriesPage(){
             {entries.map(entry =>
                 <div key={entry.id}>
                     <p>Task: {entry.taskTitle}</p>
-                    <p>Note: {entry.note}</p>
+                    {editingId === entry.id ?(
+                        <p>
+                            <input value={draft} maxLength={500} autoFocus onChange={e => setDraft(e.target.value)}
+                                onKeyDown={ e => {
+                                    if (e.key === "Enter") saveNote(entry.id);
+                                    if (e.key === "Escape") setEditingId(null);       
+                            }}/>
+                            <button onClick={() => saveNote(entry.id)}>Save</button>
+                            <button onClick={() => setEditingId(null)}>Cancel</button>
+
+                        </p>
+                    ):(
+                        <p>Note: {entry.note || "-"}{" "}
+                        <button onClick={(() => startEdit(entry))}>{entry.note ? "Edit note" : "Add note"}</button></p>
+                    )}
                     <p>Start: {new Date(entry.startedAtUtc.endsWith("Z") ? entry.startedAtUtc : entry.startedAtUtc + "Z").toLocaleString()}</p>
                     <p>End: {entry.endedAtUtc ? new Date(entry.endedAtUtc.endsWith("Z") ? entry.endedAtUtc : entry.endedAtUtc + "Z").toLocaleString() : "Not done"}</p>
-                    <p>Duration: {entry.durationMinutes ?? "Running"}</p>
+                    <p>Duration: {entry.durationMinutes != null ? `${entry.durationMinutes} min` : "Running"}</p>
+                    {!entry.endedAtUtc && (<button onClick={() => handleStop(entry.id)}>Stop</button>)}
+                    <button onClick={() => handleDelete(entry.id)}>Delete entry</button>
                 </div>
             )}
         </div>
