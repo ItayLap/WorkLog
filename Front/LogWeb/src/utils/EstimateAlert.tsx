@@ -43,6 +43,7 @@ export default function EstimateAlert(){
     // }, [activeEntry?.id]);
     useEffect(() =>{
         setError("");
+        setNote("");
         if (!snoozeKey || !snoozeCountKey) {
             setSnoozeUntil(0);
             setSnoozeCount(0);
@@ -136,6 +137,10 @@ export default function EstimateAlert(){
         }catch{}
     }
 
+    function UpdateNote(id:number) {
+        
+    }
+
     return(
         <div role="dialog" aria-modal="true" style={{
             position:"fixed",
@@ -173,8 +178,8 @@ export default function EstimateAlert(){
                     {forgot && (<button disabled={busy} onClick={() => finish(false) }>task completed within estimated time <br/>
                         ({formatDuration(allottedMinutes * 60)} min.)</button>)}
                     <form style={{display:"flex", flexDirection: "column"}}>
-                        <input type="text" value={note} placeholder="Note" onChange={e => setNote(e.target.value)}/>
-                        <button onClick={UpdateNote}>add note</button>
+                        <input type="text" value={note} placeholder="Note" onChange={e => setNote(e.target.value)} maxLength={500} style={{width:"100%", boxSizing:"border-box", marginBottom: 8}}/>
+                        {/* <button onClick={UpdateNote}>add note</button> */}
                     </form>
                 </div>
             </div>

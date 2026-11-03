@@ -4,6 +4,7 @@ import {
     getMyEntries,
     StopTimeEntry,
     DeleteEntry,
+    UpdateNote
  } from "./Api/TimeApi";
 import { useTimer, formatElapsedSeconds } from "./utils/TimerContext";
 
@@ -11,7 +12,8 @@ export default function TimeEntriesPage(){
     const [entries, setEntries] = useState<any[]>([]);
     const {activeEntry, elapsedSeconds, stop, refresh} = useTimer();
 
-    
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [draft, setDraft] = useState("");
 
     async function loadEntries() {
         try{
@@ -41,6 +43,18 @@ export default function TimeEntriesPage(){
             }
             await DeleteEntry(id);
             await loadEntries();
+            await refresh();
+        }catch(error){
+            console.error(error);
+        }
+    }
+
+    async function saveNote(id: string) {
+        try{
+            await UpdateNote(id, draft);
+            setEditingId(null);
+            await loadEntries();
+            await refresh();
         }catch(error){
             console.error(error);
         }
