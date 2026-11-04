@@ -11,6 +11,7 @@ import {Link, useParams} from "react-router-dom";
 import Api from "./Api";
 import axios from "axios";
 import { useTimer, formatElapsedSeconds } from "./utils/TimerContext";
+import { formatDuration } from "./utils/FormatDuration";
 import { StopTimeEntry } from "./Api/TimeApi";
 import { Button } from "react-bootstrap";
 
@@ -111,7 +112,7 @@ export default function ProjectDetailsPage(){
     }
     async function onStart(taskId: string) {
         try{
-            await start(taskId, getNote(taskId) || "Stopped from frontend");
+            await start(taskId, getNote(taskId) || undefined);
             setNoteFor(taskId, "");
         }catch(Error){
             if (axios.isAxiosError(Error)) {
@@ -123,7 +124,7 @@ export default function ProjectDetailsPage(){
 
     async function onStop(taskId: string ) {
         try{   
-            await stop(getNote(taskId));
+            await stop(getNote(taskId).trim() || undefined);
             setNoteFor(taskId, "");
         }catch(Error){
             console.log(Error)
@@ -270,6 +271,10 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                 const anotherRunning = !!activeEntry && !isRunning;
                 const isTaskDone = task.status == 2;
 
+                const trackedSecondes =(task.trackedSecondes ?? 0) + (isRunning ? elapsedSeconds : 0);
+                const estimateSeconds = (task.estimateMinutes ?? 0) * 60;
+                const overEstimate = estimateSeconds > 0 && trackedSecondes > estimateSeconds;
+
                 const priorityColors: Record<number, string> = {1:"#4caf50", 2:"#ff9800", 3:"#f44336"};
                 const priorityLabels: Record<number, string> = {1:"Low", 2:"Medium", 3:"High"};
 
@@ -278,7 +283,9 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                     border: "2px solid #2e7d32", borderRadius: 6, padding: 8, marginBottom: 8
                 } : {marginBottom: 8}}>
                     <h4>{task.title}</h4>
-                    <p>Estimate: {task.estimateMinutes}</p>
+                    <p>Estimate: {formatDuration(task.estimateSeconds)}</p>
+                    <p>Tracked :<span style={{color: overEstimate ? "c62828" : undefined}}>{formatDuration(trackedSecondes)}</span></p>
+                    
                     <span style={{
                         display:"inline-block",
                         fontSize: 11,

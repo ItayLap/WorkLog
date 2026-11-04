@@ -24,24 +24,25 @@ export default function TimeEntriesPage(){
         }
     }
 
-    async function handleStop(id: string) {
+    async function handleStop(id: string, note:string) {
         try{
             if(activeEntry?.id === id){
                 await stop();
             }else{
                 await StopTimeEntry({}, id)
             }
+            await UpdateNote(id, note);
             await loadEntries();
-            await refresh
+            await refresh();
         }catch(error){
             console.error(error);
         }
     }
 
-    async function handleDelete(id: string) {
+    async function handleDelete(id: string, note:string) {
         try{
             if (!entries.find(x => x.id === id)?.endedAtUtc) {
-                await handleStop(id);
+                await handleStop(id, note);
             }
             await DeleteEntry(id);
             await loadEntries();
@@ -85,7 +86,6 @@ export default function TimeEntriesPage(){
                     <h3 style={{margin:0}}> Active timer</h3>
                     <p style={{margin:"8px 0"}}>Task: {activeEntry.taskTitle}</p>
                     <p style={{margin:"8px 0", fontSize:28, fontFamily:"monoscope"}}>Time spent: {formatElapsedSeconds(elapsedSeconds)}</p>
-                    <button onClick={() => handleStop(activeEntry.id)}>Stop</button>
                 </div>
             )}
             {entries.length === 0 &&(<p>no time entries yet</p>)}
@@ -105,13 +105,13 @@ export default function TimeEntriesPage(){
                         </p>
                     ):(
                         <p>Note: {entry.note || "-"}{" "}
-                        <button onClick={(() => startEdit(entry))}>{entry.note ? "Edit note" : "Add note"}</button></p>
+                        <button onClick={() => startEdit(entry)}>{entry.note ? "Edit note" : "Add note"}</button></p>
                     )}
                     <p>Start: {new Date(entry.startedAtUtc.endsWith("Z") ? entry.startedAtUtc : entry.startedAtUtc + "Z").toLocaleString()}</p>
                     <p>End: {entry.endedAtUtc ? new Date(entry.endedAtUtc.endsWith("Z") ? entry.endedAtUtc : entry.endedAtUtc + "Z").toLocaleString() : "Not done"}</p>
                     <p>Duration: {entry.durationMinutes != null ? `${entry.durationMinutes} min` : "Running"}</p>
-                    {!entry.endedAtUtc && (<button onClick={() => handleStop(entry.id)}>Stop</button>)}
-                    <button onClick={() => handleDelete(entry.id)}>Delete entry</button>
+                    {!entry.endedAtUtc && (<button onClick={() => handleStop(entry.id, entry.note )}>Stop</button>)}
+                    <button onClick={() => handleDelete(entry.id, entry.note)}>Delete entry</button>
                 </div>
             )}
         </div>

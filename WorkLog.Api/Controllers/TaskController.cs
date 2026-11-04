@@ -62,7 +62,10 @@ namespace WorkLog.Api.Controllers
                         t.Status,
                         t.Priority,
                         t.EstimateMinutes,
-                        TimeEntriesCount = t.TimeEntries.Count
+                        TimeEntriesCount = t.TimeEntries.Count,
+                        TrackedSeconds = t.TimeEntries
+                        .Where(e => e.EndedAtUtc != null)
+                        .Sum(e => (long?)EF.Functions.DateDiffSecond(e.StartedAtUtc, e.EndedAtUtc!.Value)) ?? 0
                     }).OrderBy(t => t.Status)
                     .OrderBy(t => t.Title)
                     .ToListAsync();
