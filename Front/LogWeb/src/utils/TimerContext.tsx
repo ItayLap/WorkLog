@@ -11,6 +11,7 @@ interface ActiveTimeEntry{
     startedAtUtc: string;
     endedAtUtc: string | null;
     note: string | null;
+    previousSeconds: number;
 }
 interface TimerContextValue{
     activeEntry: ActiveTimeEntry | null;

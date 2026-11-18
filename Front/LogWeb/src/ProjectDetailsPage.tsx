@@ -311,6 +311,7 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                             <span style={{fontFamily: "monospace", fontSize: 18, margin:"0 8px"}}>{formatElapsedSeconds(elapsedSeconds)}</span>
                             <input type="Text" placeholder="Stop note(Optional)" value={getNote(task.id)} onChange={e => setNoteFor(task.id, e.target.value)}/>
                             <button onClick={() => onStop(task.id)}> stop timer</button>
+                            <button onClick={() => onStop(task.id)}> stop timer</button>
                         </div>) : (
                             <div>
                                 <input type="Text" placeholder="Note(Optional)" value={getNote(task.id)} onChange={e => setNoteFor(task.id, e.target.value)}/>

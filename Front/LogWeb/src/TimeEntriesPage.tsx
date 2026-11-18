@@ -4,7 +4,8 @@ import {
     getMyEntries,
     StopTimeEntry,
     DeleteEntry,
-    UpdateNote
+    UpdateNote,
+    
  } from "./Api/TimeApi";
 import { useTimer, formatElapsedSeconds } from "./utils/TimerContext";
 
@@ -66,6 +67,10 @@ export default function TimeEntriesPage(){
     function startEdit(entry : any){
         setEditingId(entry.id);
         setDraft(entry.note ?? "");
+    }
+
+    function continueOnTask(entry: any){
+
     }
 
     useEffect(()=>{

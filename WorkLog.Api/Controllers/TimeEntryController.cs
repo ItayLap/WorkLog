@@ -223,7 +223,30 @@ namespace WorkLog.Api.Controllers
                 entry.EndedAtUtc,
                 entry.Note
             }).FirstOrDefaultAsync();
-            return Ok(new {activeEntry = active});
+            if (active == null)
+            {
+                return Ok(new {activeEntry = active});
+            } 
+            var previousSeconds = await _db.TimeEntries
+            .Where(e => e.TaskItemId == active.TaskItemId && e.EndedAtUtc != null)
+            .SumAsync(e => (long?) EF.Functions.DateDiffSecond(e.StartedAtUtc, e.EndedAtUtc)) ?? 0;
+
+            return Ok(new
+            {
+                activeEntry = new
+                {
+                    active.Id,
+                    active.TaskItemId,
+                    active.TaskTitle,
+                    active.ProjectId,
+                    active.EstimateMinutes,
+                    active.UserId,
+                    active.StartedAtUtc,
+                    active.EndedAtUtc,
+                    active.Note,
+                    PreviousSeconds = previousSeconds
+                }
+            });
         }
     } 
 }

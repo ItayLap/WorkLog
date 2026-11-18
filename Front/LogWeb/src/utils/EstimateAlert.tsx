@@ -50,8 +50,10 @@ export default function EstimateAlert(){
 
     const allottedMinutes = estimateMinutes + snoozeCount * SNOOZE_MINUTES;
     const estimateSeconds = (estimateMinutes) * 60;
+    const previousSeconds = activeEntry?.previousSeconds ?? 0;
+    const totalSeconds = previousSeconds + elapsedSeconds;
     // const remindAt = estimateSeconds + extraSeconds;
-    const reached = ready && !!activeEntry && elapsedSeconds > estimateSeconds && estimateSeconds > 0 &&  Date.now() >= snoozeUntil;
+    const reached = ready && !!activeEntry && totalSeconds > estimateSeconds && estimateSeconds > 0 &&  Date.now() >= snoozeUntil;
 
     useEffect(() =>{
         if (!reached || !activeEntry) {
@@ -67,7 +69,7 @@ export default function EstimateAlert(){
         return null;
     }
 
-    const overrunSeconds = elapsedSeconds - allottedMinutes * 60; 
+    const overrunSeconds = totalSeconds - allottedMinutes * 60; 
     const forgot = overrunSeconds > 60;
 
     async function finish(countOnlyEstimate: boolean) {
@@ -80,7 +82,9 @@ export default function EstimateAlert(){
             await UpdateTask(activeEntry.taskItemId, activeEntry.projectId, 2); // transfer task to done column
             let endedAt: string | undefined;
             if (!countOnlyEstimate) {
-                const wantedMs = toUtcMs(activeEntry.startedAtUtc) + allottedMinutes * 60000;
+                const startMs = toUtcMs(activeEntry.startedAtUtc);
+                const remainingMs = Math.max(0,(allottedMinutes * 60- previousSeconds) * 1000);
+                const wantedMs = startMs + remainingMs;
                 endedAt = new Date(Math.min(wantedMs, Date.now())).toISOString();
             }
             await stop(note.trim() !== "" ? note.trim() : undefined, endedAt);
@@ -143,7 +147,7 @@ export default function EstimateAlert(){
             }}>
                 <h3 style={{marginTop:0}}>Estimated time has passed</h3>
                 <p><strong>{activeEntry.taskTitle}</strong></p>
-                <p>Estimate: {formatDuration(activeEntry.estimateMinutes * 60)} min time - passed:{formatDuration(elapsedSeconds)}</p>
+                <p>Estimate: {formatDuration(activeEntry.estimateMinutes * 60)} min time - passed:{formatDuration(totalSeconds)}</p>
                 {snoozeCount > 0 &&(
                     <p>
                         Snoozed {snoozeCount} time(s) ({formatDuration(snoozeCount * SNOOZE_MINUTES * 60)} min.).
@@ -158,9 +162,10 @@ export default function EstimateAlert(){
                     <button disabled={busy} onClick={snooze}>Still working(remind in {SNOOZE_MINUTES} min)</button>
                     {forgot && (<button disabled={busy} onClick={() => finish(false) }>task completed within estimated time <br/>
                         ({formatDuration(allottedMinutes * 60)} min.)</button>)}
+
+                    ///ad pause timer
                     <form style={{display:"flex", flexDirection: "column"}}>
                         <input type="text" value={note} placeholder="Note" onChange={e => setNote(e.target.value)} maxLength={500} style={{width:"100%", boxSizing:"border-box", marginBottom: 8}}/>
-                        {/* <button onClick={UpdateNote}>add note</button> */}
                     </form>
                 </div>
             </div>
