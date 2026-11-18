@@ -83,7 +83,7 @@ export default function EstimateAlert(){
                 const wantedMs = toUtcMs(activeEntry.startedAtUtc) + allottedMinutes * 60000;
                 endedAt = new Date(Math.min(wantedMs, Date.now())).toISOString();
             }
-            await stop(undefined, endedAt);
+            await stop(note.trim() !== "" ? note.trim() : undefined, endedAt);
             clearSnooze();
         }catch(error){
             console.error(error)
@@ -120,10 +120,6 @@ export default function EstimateAlert(){
                 localStorage.removeItem(snoozeCountKey);
             }
         }catch{}
-    }
-
-    function UpdateNote(id:number) {
-        
     }
 
     return(

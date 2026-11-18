@@ -271,9 +271,9 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                 const anotherRunning = !!activeEntry && !isRunning;
                 const isTaskDone = task.status == 2;
 
-                const trackedSecondes =(task.trackedSecondes ?? 0) + (isRunning ? elapsedSeconds : 0);
+                const trackedSeconds =(task.trackedSecondes ?? 0) + (isRunning ? elapsedSeconds : 0);
                 const estimateSeconds = (task.estimateMinutes ?? 0) * 60;
-                const overEstimate = estimateSeconds > 0 && trackedSecondes > estimateSeconds;
+                const overEstimate = estimateSeconds > 0 && trackedSeconds > estimateSeconds;
 
                 const priorityColors: Record<number, string> = {1:"#4caf50", 2:"#ff9800", 3:"#f44336"};
                 const priorityLabels: Record<number, string> = {1:"Low", 2:"Medium", 3:"High"};
@@ -283,8 +283,8 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                     border: "2px solid #2e7d32", borderRadius: 6, padding: 8, marginBottom: 8
                 } : {marginBottom: 8}}>
                     <h4>{task.title}</h4>
-                    <p>Estimate: {formatDuration(task.estimateSeconds)}</p>
-                    <p>Tracked :<span style={{color: overEstimate ? "c62828" : undefined}}>{formatDuration(trackedSecondes)}</span></p>
+                    <p>Estimate: {formatDuration(estimateSeconds)}</p>
+                    <p>Tracked :<span style={{color: overEstimate ? "#c62828" : undefined}}>{formatDuration(trackedSeconds)}</span></p>
                     
                     <span style={{
                         display:"inline-block",
