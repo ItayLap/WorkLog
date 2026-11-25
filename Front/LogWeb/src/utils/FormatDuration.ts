@@ -11,6 +11,8 @@ export function formatDuration(totalSeconds: number){
     if (w > 0 || d > 0) parts.push(`${d} d`);
     if (w > 0 || d > 0 || h > 0) parts.push(`${h} h`);
     if (w > 0 || d > 0 || h > 0 || m > 0) parts.push(`${m} m`);
-    parts.push(`${sec} s`);
+    if(sec != 0){
+        parts.push(`${sec} s`);
+    }
     return parts.join(" ");
 }

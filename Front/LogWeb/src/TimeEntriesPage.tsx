@@ -7,6 +7,7 @@ import {
     UpdateNote,
     
  } from "./Api/TimeApi";
+
 import { useTimer, formatElapsedSeconds } from "./utils/TimerContext";
 
 export default function TimeEntriesPage(){
@@ -69,10 +70,6 @@ export default function TimeEntriesPage(){
         setDraft(entry.note ?? "");
     }
 
-    function continueOnTask(entry: any){
-
-    }
-
     useEffect(()=>{
         loadEntries();
         refresh();
@@ -121,6 +118,5 @@ export default function TimeEntriesPage(){
             )}
         </div>
     );
-    // add widget active entry && activeEntry? fromatelapsed? handlestop?
 
 }

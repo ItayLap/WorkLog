@@ -12,8 +12,6 @@ import Api from "./Api";
 import axios from "axios";
 import { useTimer, formatElapsedSeconds } from "./utils/TimerContext";
 import { formatDuration } from "./utils/FormatDuration";
-import { StopTimeEntry } from "./Api/TimeApi";
-import { Button } from "react-bootstrap";
 
 import {planOptimalSchedule, ScheduleResult} from "./utils/PlanOptimalSchedule";
 
@@ -114,6 +112,11 @@ export default function ProjectDetailsPage(){
         try{
             await start(taskId, getNote(taskId) || undefined);
             setNoteFor(taskId, "");
+
+            if (!projectId) {
+                return;
+            }
+            await UpdateTask(taskId, projectId, 1);
         }catch(Error){
             if (axios.isAxiosError(Error)) {
                 setError(Error.response?.data?.error ?? "start failed");
@@ -271,7 +274,7 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                 const anotherRunning = !!activeEntry && !isRunning;
                 const isTaskDone = task.status == 2;
 
-                const trackedSeconds =(task.trackedSecondes ?? 0) + (isRunning ? elapsedSeconds : 0);
+                const trackedSeconds =(task.trackedSeconds ?? 0) + (isRunning ? elapsedSeconds : 0);
                 const estimateSeconds = (task.estimateMinutes ?? 0) * 60;
                 const overEstimate = estimateSeconds > 0 && trackedSeconds > estimateSeconds;
 
@@ -311,12 +314,12 @@ function Column({title, tasks, getNote, setNoteFor, onMove, onStart, onStop, onD
                             <span style={{fontFamily: "monospace", fontSize: 18, margin:"0 8px"}}>{formatElapsedSeconds(elapsedSeconds)}</span>
                             <input type="Text" placeholder="Stop note(Optional)" value={getNote(task.id)} onChange={e => setNoteFor(task.id, e.target.value)}/>
                             <button onClick={() => onStop(task.id)}> stop timer</button>
-                            <button onClick={() => onStop(task.id)}> stop timer</button>
+                            
                         </div>) : (
                             <div>
                                 <input type="Text" placeholder="Note(Optional)" value={getNote(task.id)} onChange={e => setNoteFor(task.id, e.target.value)}/>
                                 <button onClick={() => onStart(task.id)} disabled={anotherRunning || isTaskDone} title={anotherRunning ? "Another timer is already running" : ""}>
-                                    Start task timer
+                                    {trackedSeconds > 0 ? "Continue" : "Start"}
                                 </button>
                             </div>
                         )}
